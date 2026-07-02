@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSignIn, useSignUp } from '@clerk/clerk-react'
 import { useWaitlist } from '../context/WaitlistContext'
+import { CLERK_ENABLED } from '../lib/clerkAvailable'
 import './WaitlistModal.css'
 
 function GoogleIcon() {
@@ -14,8 +15,10 @@ function GoogleIcon() {
   )
 }
 
-export function WaitlistModal() {
-  const { isOpen, close } = useWaitlist()
+// ── Clerk-dependent content ───────────────────────────────
+// useSignUp/useSignIn are only *called* here, and this component is only
+// *rendered* when CLERK_ENABLED=true and ClerkProvider is in the tree.
+function ClerkModalContent({ close }) {
   const { signUp, isLoaded: suLoaded } = useSignUp()
   const { signIn, isLoaded: siLoaded } = useSignIn()
 
@@ -26,26 +29,7 @@ export function WaitlistModal() {
   const [busy, setBusy]   = useState(false)
   const [err, setErr]     = useState('')
 
-  const backdropRef = useRef(null)
-
-  useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e) => { if (e.key === 'Escape') close() }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [isOpen, close])
-
-  useEffect(() => {
-    if (!isOpen) return
-    const t = setTimeout(() => { setView('idle'); setName(''); setEmail(''); setCode(''); setErr('') }, 0)
-    return () => clearTimeout(t)
-  }, [isOpen])
-
-  if (!isOpen) return null
-
-  const onBackdrop = (e) => { if (e.target === backdropRef.current) close() }
-
-  // ── Google OAuth ─────────────────────────────────────────
+  // ── Google OAuth ────────────────────────────────────────
   const handleGoogle = async () => {
     if (!siLoaded) return
     try {
@@ -60,7 +44,7 @@ export function WaitlistModal() {
     }
   }
 
-  // ── Email step 1: create + send OTP ──────────────────────
+  // ── Email step 1: create + send OTP ────────────────────
   const handleEmailSubmit = async (e) => {
     e.preventDefault()
     if (!suLoaded || busy) return
@@ -85,7 +69,7 @@ export function WaitlistModal() {
     }
   }
 
-  // ── Email step 2: verify OTP ──────────────────────────────
+  // ── Email step 2: verify OTP ────────────────────────────
   const handleOtpVerify = async (e) => {
     e.preventDefault()
     if (!suLoaded || busy) return
@@ -101,138 +85,122 @@ export function WaitlistModal() {
   }
 
   return (
-    <div ref={backdropRef} className="wm__backdrop" onClick={onBackdrop}>
+    <>
+      {view !== 'success' && (
+        <button className="wm__close" onClick={close} aria-label="Close">✕</button>
+      )}
+
+      {/* IDLE */}
+      {view === 'idle' && (
+        <div className="wm__body">
+          <p className="wm__brand-tag">VERBION</p>
+          <h2 className="wm__title">Join the Waitlist</h2>
+          <p className="wm__sub">Be first to know when V2.5 ships.</p>
+          <div className="wm__actions">
+            <button className="wm__btn wm__btn--google" onClick={handleGoogle} disabled={!siLoaded}>
+              <GoogleIcon /> Continue with Google
+            </button>
+            <div className="wm__divider"><span>or</span></div>
+            <button className="wm__btn wm__btn--ghost" onClick={() => setView('email')}>
+              Continue with Email
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* EMAIL FORM */}
+      {view === 'email' && (
+        <form className="wm__body" onSubmit={handleEmailSubmit} noValidate>
+          <button type="button" className="wm__back" onClick={() => { setView('idle'); setErr('') }}>← Back</button>
+          <h2 className="wm__title">Your details</h2>
+          <label className="wm__field">
+            <span className="wm__field-label">Name</span>
+            <input className="wm__input" type="text" placeholder="Your name" value={name}
+              onChange={(e) => setName(e.target.value)} required autoComplete="name" autoFocus />
+          </label>
+          <label className="wm__field">
+            <span className="wm__field-label">Email</span>
+            <input className="wm__input" type="email" placeholder="you@example.com" value={email}
+              onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+          </label>
+          {err && <p className="wm__error">{err}</p>}
+          <button className="wm__btn wm__btn--primary" type="submit" disabled={busy || !name.trim() || !email.trim()}>
+            {busy ? 'Sending…' : 'Get Verification Code →'}
+          </button>
+        </form>
+      )}
+
+      {/* OTP */}
+      {view === 'otp' && (
+        <form className="wm__body" onSubmit={handleOtpVerify} noValidate>
+          <button type="button" className="wm__back" onClick={() => { setView('email'); setCode(''); setErr('') }}>← Back</button>
+          <h2 className="wm__title">Check your inbox</h2>
+          <p className="wm__sub">We sent a 6-digit code to&nbsp;<strong>{email}</strong></p>
+          <input className="wm__input wm__input--otp" type="text" inputMode="numeric"
+            pattern="[0-9]{6}" maxLength={6} placeholder="000000" value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} required autoFocus />
+          {err && <p className="wm__error">{err}</p>}
+          <button className="wm__btn wm__btn--primary" type="submit" disabled={busy || code.length !== 6}>
+            {busy ? 'Verifying…' : 'Confirm →'}
+          </button>
+        </form>
+      )}
+
+      {/* SUCCESS */}
+      {view === 'success' && (
+        <div className="wm__body wm__body--success">
+          <div className="wm__check-ring">✓</div>
+          <h2 className="wm__title">You're on the list.</h2>
+          <p className="wm__sub">We'll reach out when VERBION V2.5 is ready to ship.</p>
+          <button className="wm__btn wm__btn--primary" onClick={close}>Done</button>
+        </div>
+      )}
+    </>
+  )
+}
+
+// ── Placeholder when no Clerk key is configured ───────────
+function NoClerkContent() {
+  return (
+    <div className="wm__body wm__body--success">
+      <div className="wm__check-ring" style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.35)', fontSize: '1.25rem' }}>
+        ✦
+      </div>
+      <h2 className="wm__title">Waitlist Opening Soon</h2>
+      <p className="wm__sub">Sign-up launches with VERBION V2.5. Check back soon.</p>
+    </div>
+  )
+}
+
+// ── Main export — no Clerk hooks here ────────────────────
+export function WaitlistModal() {
+  const { isOpen, close } = useWaitlist()
+  const backdropRef = useRef(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, close])
+
+  if (!isOpen) return null
+
+  return (
+    <div
+      ref={backdropRef}
+      className="wm__backdrop"
+      onClick={(e) => { if (e.target === backdropRef.current) close() }}
+    >
       <div className="wm__panel" role="dialog" aria-modal="true" aria-label="Join the VERBION waitlist">
-
-        {view !== 'success' && (
-          <button className="wm__close" onClick={close} aria-label="Close">✕</button>
+        {CLERK_ENABLED ? (
+          <ClerkModalContent close={close} />
+        ) : (
+          <>
+            <button className="wm__close" onClick={close} aria-label="Close">✕</button>
+            <NoClerkContent />
+          </>
         )}
-
-        {/* ── IDLE ─────────────────────────── */}
-        {view === 'idle' && (
-          <div className="wm__body">
-            <p className="wm__brand-tag">VERBION</p>
-            <h2 className="wm__title">Join the Waitlist</h2>
-            <p className="wm__sub">Be first to know when V2.5 ships.</p>
-
-            <div className="wm__actions">
-              <button
-                className="wm__btn wm__btn--google"
-                onClick={handleGoogle}
-                disabled={!siLoaded}
-              >
-                <GoogleIcon /> Continue with Google
-              </button>
-
-              <div className="wm__divider"><span>or</span></div>
-
-              <button
-                className="wm__btn wm__btn--ghost"
-                onClick={() => setView('email')}
-              >
-                Continue with Email
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ── EMAIL FORM ────────────────────── */}
-        {view === 'email' && (
-          <form className="wm__body" onSubmit={handleEmailSubmit} noValidate>
-            <button type="button" className="wm__back" onClick={() => { setView('idle'); setErr('') }}>
-              ← Back
-            </button>
-            <h2 className="wm__title">Your details</h2>
-
-            <label className="wm__field">
-              <span className="wm__field-label">Name</span>
-              <input
-                className="wm__input"
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                autoComplete="name"
-                autoFocus
-              />
-            </label>
-
-            <label className="wm__field">
-              <span className="wm__field-label">Email</span>
-              <input
-                className="wm__input"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </label>
-
-            {err && <p className="wm__error">{err}</p>}
-
-            <button
-              className="wm__btn wm__btn--primary"
-              type="submit"
-              disabled={busy || !name.trim() || !email.trim()}
-            >
-              {busy ? 'Sending…' : 'Get Verification Code →'}
-            </button>
-          </form>
-        )}
-
-        {/* ── OTP ──────────────────────────── */}
-        {view === 'otp' && (
-          <form className="wm__body" onSubmit={handleOtpVerify} noValidate>
-            <button type="button" className="wm__back" onClick={() => { setView('email'); setCode(''); setErr('') }}>
-              ← Back
-            </button>
-            <h2 className="wm__title">Check your inbox</h2>
-            <p className="wm__sub">
-              We sent a 6-digit code to&nbsp;<strong>{email}</strong>
-            </p>
-
-            <input
-              className="wm__input wm__input--otp"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              placeholder="000000"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              required
-              autoFocus
-            />
-
-            {err && <p className="wm__error">{err}</p>}
-
-            <button
-              className="wm__btn wm__btn--primary"
-              type="submit"
-              disabled={busy || code.length !== 6}
-            >
-              {busy ? 'Verifying…' : 'Confirm →'}
-            </button>
-          </form>
-        )}
-
-        {/* ── SUCCESS ──────────────────────── */}
-        {view === 'success' && (
-          <div className="wm__body wm__body--success">
-            <div className="wm__check-ring">✓</div>
-            <h2 className="wm__title">You're on the list.</h2>
-            <p className="wm__sub">
-              We'll reach out when VERBION V2.5 is ready to ship.
-            </p>
-            <button className="wm__btn wm__btn--primary" onClick={close}>
-              Done
-            </button>
-          </div>
-        )}
-
       </div>
     </div>
   )
