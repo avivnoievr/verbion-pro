@@ -13,9 +13,9 @@ const CLIPT_DIR  = '/frames/clipT'   // 4s transition bridge clip1→clip2
 const CLIP2_DIR  = '/frames/clip2'
 const CLIP3_DIR  = '/frames/clip3'
 
-const FRAMES1 = 141
+const FRAMES1 = 145
 const FRAMEST = 93   // 4.04s × 24fps − 4 trimmed frames
-const FRAMES2 = 141
+const FRAMES2 = 145
 const FRAMES3 = 141
 
 // ── Hard-cut boundaries (no dissolves — instant switches) ─
