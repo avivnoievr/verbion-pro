@@ -1,0 +1,93 @@
+/* ── Site header — transparent bar, glass chips per item ─── */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(14px, 2.2vw, 20px) clamp(20px, 4vw, 48px);
+  /* no background — individual chips carry the glass */
+}
+
+/* ── Brand ─────────────────────────────────────────────── */
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.site-header__logo {
+  width: 24px;
+  height: 24px;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+.site-header__wordmark {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  color: var(--ink);
+}
+
+/* ── Nav container ──────────────────────────────────────── */
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Individual glass pill/chip ─────────────────────────── */
+.sh-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.46rem 1.05rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-display);
+  font-size: 0.725rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  white-space: nowrap;
+  will-change: transform;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.sh-pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+/* ── Accent CTA chip ────────────────────────────────────── */
+.sh-pill--cta {
+  background: rgba(0, 184, 184, 0.13);
+  border-color: rgba(0, 184, 184, 0.38);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sh-pill--cta:hover {
+  background: rgba(0, 184, 184, 0.24);
+  border-color: rgba(0, 184, 184, 0.62);
+  color: var(--accent);
+}
+
+/* ── Mobile: hide nav links, keep CTA ──────────────────── */
+@media (max-width: 640px) {
+  .site-header__nav .sh-pill:not(.sh-pill--cta) {
+    display: none;
+  }
+}

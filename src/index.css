@@ -1,0 +1,105 @@
+:root {
+  color-scheme: dark;
+
+  --font-display: 'Inter', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --accent: #00B8B8; /* Cyan Blue — confirmed silicone sleeve color, VERBION V2.5 spec */
+  --ink: #f3f4f6;
+  --ink-dim: #9aa3af;
+  --bg: #05070a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+/* Inline accent — key specs, numbers, product name */
+.accent {
+  color: var(--accent);
+}
+
+/* ── Video text overlay utility ──────────────────────────── */
+
+.vtext {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 clamp(1.5rem, 8vw, 6rem);
+  pointer-events: none;
+  will-change: opacity, transform;
+  opacity: 0;
+}
+
+.vtext__eyebrow {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.7);
+}
+
+/* Large display headline (beats 3-5) */
+.vtext__headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-shadow:
+    0 2px 40px rgba(0, 0, 0, 0.75),
+    0 0 80px rgba(0, 0, 0, 0.35);
+}
+
+/* Mid-weight tagline (beat 1 beneath the wordmark) */
+.vtext__tagline {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.90);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+}
+
+.vtext__sub {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(0.9375rem, 1.4vw, 1.125rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.80);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.65);
+  line-height: 1.55;
+}
+
+/* Secondary detail line */
+.vtext__detail {
+  margin: 0.7rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(0.75rem, 1.0vw, 0.875rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.52);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
