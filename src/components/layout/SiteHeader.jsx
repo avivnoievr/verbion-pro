@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useWaitlist } from '../../context/WaitlistContext'
 import './SiteHeader.css'
 
 const NAV_LINKS = [
@@ -14,15 +15,13 @@ const pill = {
 }
 
 export function SiteHeader() {
+  const { open } = useWaitlist()
+
   return (
     <header className="site-header">
       {/* Brand */}
       <div className="site-header__brand">
-        <svg
-          className="site-header__logo"
-          viewBox="0 0 48 48"
-          aria-hidden="true"
-        >
+        <svg className="site-header__logo" viewBox="0 0 48 48" aria-hidden="true">
           <circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" strokeWidth="1.5" />
           <circle cx="24" cy="18" r="5"  fill="none" stroke="currentColor" strokeWidth="1.5" />
           <path d="M9 28c4-3 8-3 12 0s8 3 12 0s4-3 4-3" fill="none" stroke="currentColor" strokeWidth="1.5" />
@@ -31,27 +30,22 @@ export function SiteHeader() {
         <span className="site-header__wordmark">VERBION</span>
       </div>
 
-      {/* Nav with individual glass chips */}
+      {/* Nav */}
       <nav className="site-header__nav">
         {NAV_LINKS.map(({ label, href }) => (
-          <motion.a
-            key={label}
-            href={href}
-            className="sh-pill"
-            {...pill}
-          >
+          <motion.a key={label} href={href} className="sh-pill" {...pill}>
             {label}
           </motion.a>
         ))}
 
-        {/* Accent CTA chip */}
-        <motion.a
-          href="#buy"
+        <motion.button
+          type="button"
           className="sh-pill sh-pill--cta"
+          onClick={open}
           {...pill}
         >
           Pre-Order&nbsp;₪320
-        </motion.a>
+        </motion.button>
       </nav>
     </header>
   )

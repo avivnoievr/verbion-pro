@@ -1,6 +1,9 @@
+import { useWaitlist } from '../context/WaitlistContext'
 import './ComingSoon.css'
 
 export function ComingSoon() {
+  const { open } = useWaitlist()
+
   return (
     <section className="cs">
       <div className="cs__glow" aria-hidden="true" />
@@ -22,18 +25,9 @@ export function ComingSoon() {
           <p className="cs__price-note">Limited early-adopter allocation · Ships when available</p>
         </div>
 
-        <form className="cs__form" onSubmit={(e) => e.preventDefault()}>
-          <input
-            className="cs__email"
-            type="email"
-            placeholder="your@email.com"
-            aria-label="Email address for pre-order notification"
-            required
-          />
-          <button className="cs__btn" type="submit">
-            RESERVE YOURS →
-          </button>
-        </form>
+        <button className="cs__btn" type="button" onClick={open}>
+          RESERVE YOURS →
+        </button>
 
         <div className="cs__features">
           <div className="cs__feat">
