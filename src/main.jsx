@@ -15,8 +15,17 @@ const isCallback = window.location.pathname === '/sso-callback'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {CLERK_ENABLED ? (
-      <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
-        {isCallback ? <AuthenticateWithRedirectCallback /> : <App />}
+      <ClerkProvider
+        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+        signInUrl="/"
+        signUpUrl="/"
+        afterSignInUrl="/"
+        afterSignUpUrl="/"
+      >
+        {isCallback
+          ? <AuthenticateWithRedirectCallback afterSignInUrl="/" afterSignUpUrl="/" />
+          : <App />
+        }
       </ClerkProvider>
     ) : (
       <App />
