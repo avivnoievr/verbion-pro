@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 
@@ -39,12 +39,27 @@ function Rocks() {
 }
 
 export default function RockBed() {
+  const wrapRef = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  // Only run the WebGL loop while the bed is actually on screen —
+  // an always-on render loop drags every scrub section down with it.
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: '20%' },
+    )
+    io.observe(wrapRef.current)
+    return () => io.disconnect()
+  }, [])
+
   return (
-    <div className="rockbed" aria-hidden="true">
+    <div className="rockbed" aria-hidden="true" ref={wrapRef}>
       <Canvas
         dpr={[1, 1.5]}
+        frameloop={visible ? 'always' : 'never'}
         camera={{ position: [0, 0.4, 6.5], fov: 38 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
+        gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
       >
         <fog attach="fog" args={['#0A0A0A', 6, 12]} />
         <ambientLight intensity={0.25} />
