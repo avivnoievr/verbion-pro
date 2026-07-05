@@ -1,36 +1,3 @@
-# Claude Code session data (memories, plans, tasks — local only)
-.claude/
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Env / secrets
+node_modules/
 .env
-.env.*
-!.env.example
-
-# Development-only assets (AI reference images, raw source videos, GLB source files,
-# pipeline intermediates). None of this is served by the site — public/ handles that.
-assets/
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.env.local

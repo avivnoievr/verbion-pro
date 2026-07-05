@@ -1,0 +1,28 @@
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+
+  /*
+   * Layer 1 (top): soft centre glow — not a shape, just warmth of light.
+   *   Large, heavily feathered — you feel it, you don't see it as an oval.
+   * Layer 2 (bottom): teal field that darkens aggressively to pure black
+   *   at the edges — premium vignette, not just dark teal.
+   */
+  background:
+    radial-gradient(
+      ellipse 54% 72% at 50% 50%,
+      rgba(255, 255, 255, 0.82)  0%,
+      rgba(255, 255, 255, 0.34) 22%,
+      rgba(255, 255, 255, 0.08) 46%,
+      rgba(255, 255, 255, 0.00) 68%
+    ),
+    radial-gradient(
+      ellipse 88% 88% at 50% 50%,
+      #32d9c8  0%,
+      #1dc2b1 22%,
+      #0d8a80 50%,
+      #042e2a 75%,
+      #000000 100%
+    );
+}

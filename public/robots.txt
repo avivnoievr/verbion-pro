@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-
-# Allow CSS and JS so Googlebot can render the page
-Allow: /assets/
-Allow: /src/
-
-Sitemap: https://verbion.shop/sitemap.xml

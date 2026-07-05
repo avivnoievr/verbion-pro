@@ -1,0 +1,195 @@
+/* Single unified scroll container — 900vh = 100vh pinned stage + 800vh scroll travel */
+.vs {
+  position: relative;
+  height: 900vh;
+}
+
+.vs__stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #d8dde3; /* matches clip1 Beat-1 light-gray background */
+}
+
+/* Sky-image fallback: visible until clip1's first frame renders */
+.vs__sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('/images/sky-bg.png') center 65% / cover no-repeat;
+}
+
+.vs__sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(3, 9, 20, 0.5) 0%,
+    rgba(3, 9, 20, 0.05) 35%,
+    rgba(3, 9, 20, 0.45) 100%);
+}
+
+/* ── Canvas layers ───────────────────────────────────────────
+   All three canvases fill the same 100vh stage.
+   Opacity cross-fades are driven by VideoSection.jsx's onUpdate. */
+.vs__canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.vs__canvas--1 { z-index: 1; }                /* clip1: visible by default */
+.vs__canvas--T { z-index: 2; opacity: 0; }   /* clipT: hidden until CF_T */
+.vs__canvas--2 { z-index: 3; opacity: 0; }   /* clip2: hidden until CF_2 */
+.vs__canvas--3 { z-index: 4; opacity: 0; }   /* clip3: hidden until CF_3 */
+
+/* ── Text overlay layers ─────────────────────────────────── */
+.vs__beat1,
+.vs__beat3,
+.vs__beat4,
+.vs__beat5 {
+  z-index: 4;
+}
+
+/* Beat 1: must start visible (overrides .vtext { opacity: 0 }).
+   JS only controls the fade-out when user scrolls into Beat 3. */
+.vs__beat1 {
+  opacity: 1;
+  justify-content: flex-end;
+  padding-bottom: 9vh;
+}
+
+/* Beat 5 (frost payoff on clip3): mirror to bottom-right for visual variety */
+.vs__beat5 {
+  align-items: flex-end;
+  text-align: right;
+  padding-left: 0;
+  padding-right: clamp(2.5rem, 5vw, 5.5rem);
+}
+.vs__beat5 > * {
+  text-align: right;
+}
+
+/* ── VERBION wordmark ─────────────────────────────────────── */
+.vs__wordmark {
+  margin: 0.2rem 0 0.3rem;
+  font-size: clamp(1.75rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  color: var(--accent);
+  text-shadow: 0 0 60px rgba(0, 184, 184, 0.28);
+  text-transform: uppercase;
+  animation: vs-enter 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+}
+
+/* Shared entrance keyframe: slide from left + fade */
+@keyframes vs-enter {
+  from { opacity: 0; transform: translateX(-44px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Staggered CSS entrances for Beat 1 children (fire once on page load) */
+.vs__beat1 .vtext__eyebrow {
+  animation: vs-enter 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.20s both;
+}
+
+.vs__wordmark {
+  animation: vs-enter 1.10s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+}
+
+.vs__beat1 .vtext__tagline {
+  animation: vs-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both;
+}
+
+.vs__beat1 .vtext__sub {
+  animation: vs-enter 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.78s both;
+}
+
+.vs__beat1 .vtext__detail {
+  animation: vs-enter 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.96s both;
+}
+
+/* ── Split panel — X-ray section (clip2) ─────────────────
+   Slides in from the LEFT, clips the canvas to show right portion. */
+.vs__split-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36%;
+  height: 100%;
+  background: rgba(3, 5, 9, 0.88);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(32px) saturate(150%);
+  -webkit-backdrop-filter: blur(32px) saturate(150%);
+  z-index: 5;
+  pointer-events: none;
+  will-change: opacity, transform;
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.vs__split-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 0 clamp(1.5rem, 3.5vw, 3.5rem) 0 clamp(2rem, 5vw, 4.5rem);
+}
+
+.vs__split-eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.30);
+  text-transform: uppercase;
+}
+
+.vs__split-headline {
+  margin: 0 0 1.75rem;
+  font-size: clamp(1.75rem, 3.5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.vs__split-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.vs__split-row {
+  display: flex;
+  gap: 0.9rem;
+  font-size: clamp(0.5625rem, 0.8vw, 0.6875rem);
+  color: rgba(255, 255, 255, 0.52);
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+  line-height: 1.5;
+}
+
+.vs__split-key {
+  flex-shrink: 0;
+  min-width: 4.5rem;
+  color: var(--accent);
+}
+
+.vs__split-row--target .vs__split-key,
+.vs__split-row--target span:last-child {
+  font-size: clamp(0.75rem, 1.1vw, 0.9375rem);
+  font-weight: 700;
+}
+
+.vs__split-detail {
+  margin: 0;
+  font-size: clamp(0.5625rem, 0.85vw, 0.75rem);
+  color: rgba(255, 255, 255, 0.34);
+  line-height: 1.8;
+}
+

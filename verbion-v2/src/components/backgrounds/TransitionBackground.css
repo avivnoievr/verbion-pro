@@ -1,0 +1,64 @@
+.trans-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse 80% 80% at 50% 50%,
+      transparent         0%,
+      rgba(0, 0, 0, 0.32) 55%,
+      rgba(0, 0, 0, 0.72) 80%,
+      rgba(0, 0, 0, 0.96) 100%
+    ),
+    #d45b15;
+}
+
+/* ── 6 wave rows — equal spacing, one wave each ─────── */
+.trans-bg__waves {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly; /* equal gaps including top/bottom */
+  padding: 0;
+  pointer-events: none;
+  /* Waves sit above the vignette overlay */
+  z-index: 1;
+}
+
+.trans-bg__row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  /* No background — fully transparent, rows never cover each other */
+  background: transparent;
+  overflow: visible;
+}
+
+/* ONE wave image per row, stretched to full width, no repeat */
+.trans-bg__wave-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: clamp(40px, 6vh, 80px);
+  object-fit: fill;   /* stretch to exactly fill the row width */
+  user-select: none;
+  pointer-events: none;
+  /* PNG already has true alpha — no blend mode needed */
+  opacity: 0.55;
+}
+
+/* ── Teal rings ──────────────────────────────────────── */
+.trans-bg__ring {
+  position: absolute;
+  inset: 0;
+  background-color: #1dc2b1;
+  clip-path: circle(0% at 50% 50%);
+  pointer-events: none;
+  will-change: clip-path;
+  z-index: 2;
+}
+
+.trans-bg__ring--1 {
+  opacity: 0.55;
+}

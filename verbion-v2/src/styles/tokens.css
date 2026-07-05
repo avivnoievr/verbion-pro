@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════════════════════
+   VERBION V2 — Design Tokens
+   Single source of truth for all colors, spacing, typography
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Section backgrounds ── */
+  --bg-hero:        #1dc2b1;   /* Page 1 — Hero. Teal. Radial → white oval center */
+  --bg-transition:  #d45b15;   /* Page 2 — Feature. Burnt orange. Wave elements */
+  --bg-products:    #1f1c1b;   /* Page 3 — Products. Deep warm charcoal */
+
+  /* ── Hero gradient stops (light → edge) ── */
+  --hero-core:      #ffffff;
+  --hero-near:      #c8f4ef;
+  --hero-mid:       #5dd9ce;
+  --hero-deep:      #1dc2b1;
+  --hero-edge:      #0e8a7f;
+
+  /* ── Accent / brand ── */
+  --accent:         #1dc2b1;
+  --accent-warm:    #d45b15;
+
+  /* ── Text ── */
+  --ink:            #ffffff;
+  --ink-muted:      rgba(255, 255, 255, 0.55);
+
+  /* ── Spacing scale ── */
+  --space-xs:  0.5rem;
+  --space-sm:  1rem;
+  --space-md:  2rem;
+  --space-lg:  4rem;
+  --space-xl:  8rem;
+}

@@ -1,0 +1,154 @@
+/* ── Product Catalog section ──────────────────────────── */
+.pc {
+  position: relative;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  padding-bottom: 3rem;
+
+  /* Day-sky gradient — shows through the transparent R3F canvas */
+  background: linear-gradient(180deg,
+    #060e21 0%,
+    #0c1e40 18%,
+    #183876 38%,
+    #2e68b0 58%,
+    #6aabd6 76%,
+    #a8d0ee 90%,
+    #c8e4f4 100%
+  );
+}
+
+
+/* ── R3F canvas — fills entire section ─────────────────── */
+.pc__canvas {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 1;
+}
+
+/* ── HTML content — above canvas ────────────────────────── */
+.pc__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(3.5rem, 7vh, 6rem) clamp(1.5rem, 6vw, 3rem);
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pc__eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: rgba(255, 255, 255, 0.42);
+  text-transform: uppercase;
+}
+
+.pc__headline {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  text-shadow: 0 2px 30px rgba(0,0,0,0.5);
+}
+
+.pc__sub {
+  margin: 0 0 3rem;
+  font-size: clamp(0.8125rem, 1.3vw, 1rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.60);
+  line-height: 1.65;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+}
+
+/* ── Card grid ───────────────────────────────────────────── */
+.pc__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.pc__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  background: rgba(4, 10, 24, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+  overflow: hidden;
+}
+
+.pc__card--active,
+.pc__card:hover {
+  background: rgba(8, 20, 48, 0.55);
+  border-color: rgba(255, 255, 255, 0.20);
+  transform: translateY(-8px);
+  box-shadow:
+    0 24px 70px var(--card-glow, rgba(255,255,255,0.10)),
+    0 4px 20px rgba(0,0,0,0.40);
+}
+
+/* ── Swatch: tracked div — R3F renders bottle here ─────── */
+.pc__swatch {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  position: relative;
+  background: transparent;
+}
+
+/* ── Label row ──────────────────────────────────────────── */
+.pc__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 0.75rem 1.25rem;
+  width: 100%;
+}
+
+.pc__color-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-bottom: 0.2rem;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px 2px currentColor;
+}
+
+.pc__color-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.pc__color-sub {
+  font-size: 0.5625rem;
+  font-weight: 400;
+  letter-spacing: 0.10em;
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: uppercase;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pc__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 440px) {
+  .pc__grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+}

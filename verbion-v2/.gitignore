@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment — NEVER commit real keys
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+
+# Large generated assets (re-generate from scripts)
+assets/pipeline/clips/
+assets/pipeline/video/
+public/frames/
+
+# OS
+.DS_Store
+Thumbs.db

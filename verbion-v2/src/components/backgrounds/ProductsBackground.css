@@ -1,0 +1,40 @@
+.products-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Charcoal — slightly warmer at centre, true black at edges */
+  background:
+    radial-gradient(
+      ellipse 70% 70% at 50% 50%,
+      #2d2826              0%,
+      #1f1c1b             40%,
+      rgba(0, 0, 0, 0.55) 75%,
+      #000000            100%
+    );
+}
+
+/* ── Organic divider at the top of the section ─── */
+.products-bg__divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+}
+
+.products-bg__divider-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Warm vignette — center subtly brighter ─── */
+.products-bg__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    rgba(60, 45, 35, 0.0) 0%,
+    rgba(10, 8, 8, 0.45) 100%
+  );
+  pointer-events: none;
+}
