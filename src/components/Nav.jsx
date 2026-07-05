@@ -14,7 +14,10 @@ export default function Nav() {
 
   return (
     <header className={`nav${scrolled ? ' scrolled' : ''}`}>
-      <a className="nav-wordmark" href="#top">VERBION</a>
+      <a className="nav-wordmark" href="#top">
+        <img className="nav-logo" src="/images/logo-mark.png" alt="" />
+        VERBION
+      </a>
       <nav className="nav-right">
         <a className="nav-link" href="#technology">Technology</a>
         <a className="nav-link" href="#specs">Specs</a>
