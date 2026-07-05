@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useWaitlist } from '../context/WaitlistContext'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  const { open } = useWaitlist()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -17,7 +19,7 @@ export default function Nav() {
         <a className="nav-link" href="#technology">Technology</a>
         <a className="nav-link" href="#specs">Specs</a>
         <a className="nav-link" href="#preorder">Pre-Order</a>
-        <a href="#preorder"><button className="nav-cta">PRE-ORDER NOW</button></a>
+        <button className="nav-cta" onClick={open}>PRE-ORDER NOW</button>
       </nav>
     </header>
   )

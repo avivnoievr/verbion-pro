@@ -2,9 +2,45 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
+// ---------------------------------------------------------------------------
+// Shared prioritized fetch queue (module scope, all sections).
+// Frames download as Blobs in section order — ladder frames (every 6th)
+// first so every clip gets coarse coverage fast, then the gaps. The
+// active (pinned) section jumps the whole line via inst.boost.
+// ---------------------------------------------------------------------------
+let sectionSeq = 0
+const fetchQueue = []
+let fetchActive = 0
+const FETCH_MAX = 10
+
+function pumpFetch() {
+  if (!fetchQueue.length || fetchActive >= FETCH_MAX) return
+  fetchQueue.sort((a, b) => a.prio() - b.prio())
+  while (fetchActive < FETCH_MAX && fetchQueue.length) {
+    const task = fetchQueue.shift()
+    if (task.dead()) continue
+    fetchActive++
+    task
+      .run()
+      .catch(() => {})
+      .finally(() => {
+        fetchActive--
+        pumpFetch()
+      })
+  }
+}
+
+const LADDER = 6 // low-res keyframe cadence
+const LOW_W = 480 // low-res ladder decode width
+
 // Pinned full-viewport section whose canvas scrubs a WebP frame
-// sequence with scroll. Overlay tweens join the same scrubbed
-// timeline via buildTimeline(tl) using positions 0..1.
+// sequence with scroll. Frames decode into a sliding window of
+// ImageBitmaps around the playhead (GPU-cheap to draw), backed by a
+// persistent quarter-res ladder so fast flicks never hit a black
+// frame. Overlay tweens join the same scrubbed timeline via
+// buildTimeline(tl) using positions 0..1. `filmEnd` < 1 parks the
+// footage on its last frame for the remainder of the pin (used by the
+// finale to fade content in over the closing frame).
 export default function FrameScrubSection({
   id,
   frameBase,
@@ -12,10 +48,12 @@ export default function FrameScrubSection({
   pin = '+=150%',
   scrub = 1,
   poster = 0,
+  filmEnd = 1,
   fadeIn = false,
   fadeOut = false,
   brush = false,
   sheet = false,
+  tone,
   children,
   buildTimeline,
 }) {
@@ -26,72 +64,219 @@ export default function FrameScrubSection({
 
   useGSAP(
     () => {
+      const section = sectionRef.current
       const canvas = canvasRef.current
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', { alpha: false })
       const staticMode =
         window.matchMedia('(max-width: 767px)').matches ||
         window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
       const url = (i) => `${frameBase}/frame_${String(i).padStart(4, '0')}.webp`
-      const images = new Array(frameCount).fill(null)
       const state = { frame: staticMode ? poster : 0 }
+      const inst = { order: sectionSeq++, boost: false, disposed: false }
 
-      const nearestLoaded = (i) => {
-        if (images[i] && images[i].complete && images[i].naturalWidth) return images[i]
-        for (let d = 1; d < frameCount; d++) {
-          const lo = images[i - d]
-          if (lo && lo.complete && lo.naturalWidth) return lo
-          const hi = images[i + d]
-          if (hi && hi.complete && hi.naturalWidth) return hi
-        }
-        return null
+      const blobs = new Array(frameCount).fill(null)
+      const full = new Map() // frame -> full-res ImageBitmap (sliding window)
+      const low = new Map() // frame -> ladder ImageBitmap (persistent)
+      const pending = new Set()
+      let decodeActive = 0
+      let aspect = 0
+      let natW = 0
+      let dir = 1
+      let lastF = -1
+      let lastKey = ''
+
+      // --- cover-fit rect of the footage, published for image-space overlays
+      const updateImgSpace = () => {
+        if (!aspect) return
+        const cw = canvas.clientWidth
+        const ch = canvas.clientHeight
+        const h = Math.max(ch, cw / aspect)
+        const w = h * aspect
+        section.style.setProperty('--img-x', `${(cw - w) / 2}px`)
+        section.style.setProperty('--img-y', `${(ch - h) / 2}px`)
+        section.style.setProperty('--img-w', `${w}px`)
+        section.style.setProperty('--img-h', `${h}px`)
       }
 
-      const draw = () => {
-        const img = nearestLoaded(Math.round(state.frame))
-        if (!img) return
+      const pick = (f) => {
+        const exact = full.get(f)
+        if (exact) return [exact, `f${f}`]
+        let best = null
+        let bestK = -1
+        let bestD = Infinity
+        for (const [k, bm] of full) {
+          const d = Math.abs(k - f)
+          if (d < bestD) {
+            bestD = d
+            best = bm
+            bestK = k
+          }
+        }
+        if (best && bestD <= 4) return [best, `f${bestK}`]
+        let bl = null
+        let blK = -1
+        let blD = Infinity
+        for (const [k, bm] of low) {
+          const d = Math.abs(k - f)
+          if (d < blD) {
+            blD = d
+            bl = bm
+            blK = k
+          }
+        }
+        if (bl && blD < bestD) return [bl, `l${blK}`]
+        if (best) return [best, `f${bestK}`]
+        return [null, '']
+      }
+
+      const draw = (force = false) => {
+        const f = Math.round(state.frame)
+        const [bm, key] = pick(f)
+        if (!bm || (!force && key === lastKey)) return
+        lastKey = key
         const cw = canvas.width
         const ch = canvas.height
-        const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight)
-        const w = img.naturalWidth * scale
-        const h = img.naturalHeight * scale
-        ctx.clearRect(0, 0, cw, ch)
-        ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h)
+        const scale = Math.max(cw / bm.width, ch / bm.height)
+        const w = bm.width * scale
+        const h = bm.height * scale
+        ctx.drawImage(bm, (cw - w) / 2, (ch - h) / 2, w, h)
       }
 
+      // --- decode scheduling: nearest-first inside a directional window
+      const wantRange = () => {
+        const f = Math.round(state.frame)
+        const ahead = inst.boost ? 36 : 6
+        const behind = inst.boost ? 12 : 2
+        return dir >= 0 ? [f - behind, f + ahead] : [f - ahead, f + behind]
+      }
+
+      const scheduleDecodes = () => {
+        if (inst.disposed) return
+        const [lo, hi] = wantRange()
+        for (const [k, bm] of full) {
+          if (k < lo - 10 || k > hi + 20) {
+            bm.close()
+            full.delete(k)
+          }
+        }
+        const f = Math.round(state.frame)
+        const cands = []
+        for (let i = Math.max(0, lo); i <= Math.min(frameCount - 1, hi); i++) {
+          if (!full.has(i) && !pending.has(i) && blobs[i]) cands.push(i)
+        }
+        cands.sort((a, b) => Math.abs(a - f) - Math.abs(b - f))
+        for (const i of cands) {
+          if (decodeActive >= 4) break
+          pending.add(i)
+          decodeActive++
+          const opts =
+            natW && canvas.width && canvas.width < natW
+              ? { resizeWidth: canvas.width, resizeQuality: 'high' }
+              : undefined
+          createImageBitmap(blobs[i], opts)
+            .then((bm) => {
+              if (inst.disposed) {
+                bm.close()
+                return
+              }
+              full.set(i, bm)
+              if (!aspect) {
+                aspect = bm.width / bm.height
+                natW = bm.width
+                updateImgSpace()
+              }
+              if (Math.abs(i - Math.round(state.frame)) <= 2) draw()
+            })
+            .catch(() => {})
+            .finally(() => {
+              pending.delete(i)
+              decodeActive--
+              if (!inst.disposed) scheduleDecodes()
+            })
+        }
+      }
+
+      const decodeLow = (i) => {
+        if (low.has(i)) return
+        createImageBitmap(blobs[i], { resizeWidth: LOW_W })
+          .then((bm) => {
+            if (inst.disposed) {
+              bm.close()
+              return
+            }
+            low.set(i, bm)
+            if (!aspect) {
+              aspect = bm.width / bm.height
+              updateImgSpace()
+            }
+            if (Math.abs(i - Math.round(state.frame)) <= LADDER) draw()
+          })
+          .catch(() => {})
+      }
+
+      const enqueue = (i, ladder) => {
+        fetchQueue.push({
+          prio: () => (inst.boost ? -1000 : 0) + inst.order * 20 + (ladder ? 0 : 10) + i / 1e5,
+          dead: () => inst.disposed || blobs[i] !== null,
+          run: () =>
+            fetch(url(i))
+              .then((r) => r.blob())
+              .then((b) => {
+                if (inst.disposed) return
+                blobs[i] = b
+                if (ladder) decodeLow(i)
+                const [lo, hi] = wantRange()
+                if (i >= lo && i <= hi) scheduleDecodes()
+              }),
+        })
+      }
+
+      if (staticMode) {
+        enqueue(poster, true)
+        inst.boost = true
+      } else {
+        enqueue(poster, true)
+        for (let i = 0; i < frameCount; i += LADDER) if (i !== poster) enqueue(i, true)
+        for (let i = 0; i < frameCount; i++) if (i % LADDER !== 0 && i !== poster) enqueue(i, false)
+      }
+      pumpFetch()
+
       const resize = () => {
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.75)
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
         canvas.width = Math.round(canvas.clientWidth * dpr)
         canvas.height = Math.round(canvas.clientHeight * dpr)
-        draw()
+        updateImgSpace()
+        draw(true)
       }
       resize()
       window.addEventListener('resize', resize)
 
-      const load = (i) => {
-        const img = new Image()
-        img.decoding = 'async'
-        img.onload = () => {
-          if (Math.abs(i - Math.round(state.frame)) < 2 || i === poster) draw()
-        }
-        img.src = url(i)
-        images[i] = img
-      }
-      if (staticMode) {
-        load(poster)
-      } else {
-        for (let i = 0; i < frameCount; i++) load(i)
+      const onFrame = () => {
+        const f = Math.round(state.frame)
+        if (f === lastF) return
+        dir = f >= lastF ? 1 : -1
+        lastF = f
+        draw()
+        scheduleDecodes()
       }
 
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           start: 'top top',
           end: pin,
           scrub,
           pin: true,
           anticipatePin: 1,
+          onToggle: (self) => {
+            inst.boost = staticMode || self.isActive
+            if (self.isActive) {
+              pumpFetch()
+              scheduleDecodes()
+            }
+          },
         },
       })
       if (staticMode) {
@@ -99,9 +284,10 @@ export default function FrameScrubSection({
       } else {
         tl.to(
           state,
-          { frame: frameCount - 1, duration: 1, snap: 'frame', onUpdate: draw },
+          { frame: frameCount - 1, duration: filmEnd, snap: 'frame', onUpdate: onFrame },
           0,
         )
+        if (filmEnd < 1) tl.to({}, { duration: 1 - filmEnd }, filmEnd)
       }
       if (fadeIn && !staticMode) {
         tl.fromTo(
@@ -112,6 +298,7 @@ export default function FrameScrubSection({
         )
       }
       if (fadeOut && !staticMode) {
+        const outAt = typeof fadeOut === 'number' ? fadeOut : 0.93
         tl.to(
           [mediaRef.current, overlayRef.current],
           {
@@ -120,15 +307,22 @@ export default function FrameScrubSection({
             yPercent: -6,
             rotateX: 8,
             transformOrigin: '50% 12%',
-            duration: 0.07,
+            duration: 1 - outAt,
             ease: 'power1.in',
           },
-          0.93,
+          outAt,
         )
       }
       buildTimeline?.(tl)
 
-      return () => window.removeEventListener('resize', resize)
+      return () => {
+        inst.disposed = true
+        window.removeEventListener('resize', resize)
+        for (const bm of full.values()) bm.close()
+        for (const bm of low.values()) bm.close()
+        full.clear()
+        low.clear()
+      }
     },
     { scope: sectionRef },
   )
@@ -137,7 +331,7 @@ export default function FrameScrubSection({
     <section
       id={id}
       ref={sectionRef}
-      className={`scrub-section${sheet ? ' page-sheet' : ''}`}
+      className={`scrub-section${sheet ? ' page-sheet' : ''}${tone ? ` tone-${tone}` : ''}`}
       data-brush={brush || undefined}
     >
       <div ref={mediaRef} className="scrub-media">
