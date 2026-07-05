@@ -8,28 +8,32 @@ const CALLOUTS = [
     value: '30W · 40×40 mm · solid-state',
     style: { left: '7%', top: '24%' },
     mirror: false,
-    at: 0.3,
+    at: 0.5,
   },
   {
     label: 'Sintered Copper Heat Pipes',
     value: '2× Ø5 mm · design target',
     style: { right: '7%', top: '32%' },
     mirror: true,
-    at: 0.54,
+    at: 0.68,
   },
   {
     label: 'Dual Centrifugal Fans',
     value: '30 mm · push-pull · 1.0 W',
     style: { left: '9%', bottom: '20%' },
     mirror: false,
-    at: 0.78,
+    at: 0.86,
   },
 ]
 
 export default function XRay() {
   const refs = useRef([])
 
+  const subtitleRef = useRef(null)
+
   const buildTimeline = (tl) => {
+    tl.fromTo(subtitleRef.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.06, ease: 'power2.out' }, 0.08)
+      .to(subtitleRef.current, { opacity: 0, y: -12, duration: 0.05, ease: 'power1.in' }, 0.36)
     refs.current.forEach((el, i) => {
       if (!el) return
       const line = el.querySelector('.callout-line')
@@ -49,10 +53,10 @@ export default function XRay() {
     <FrameScrubSection
       id="technology"
       frameBase="/frames/xray"
-      frameCount={144}
-      pin="+=160%"
+      frameCount={241}
+      pin="+=200%"
       scrub={1}
-      poster={100}
+      poster={180}
       fadeIn
       fadeOut
       buildTimeline={buildTimeline}
@@ -60,6 +64,10 @@ export default function XRay() {
       <div className="section-eyebrow">
         Intelligent Power Dock
         <strong>The cooling engine, exposed.</strong>
+      </div>
+      <div className="xray-subtitle" ref={subtitleRef}>
+        Live telemetry flows in — nRF52840 · BLE 5.2.
+        <span>Then the dock answers, in order.</span>
       </div>
       {CALLOUTS.map((c, i) => (
         <div
