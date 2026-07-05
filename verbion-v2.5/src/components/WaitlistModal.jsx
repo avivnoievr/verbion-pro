@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSignIn, useSignUp } from '@clerk/clerk-react'
 import { useWaitlist } from '../context/WaitlistContext'
-import { CLERK_ENABLED } from '../lib/clerkAvailable'
+import { isClerkEnabled } from '../lib/clerkAvailable'
 import './WaitlistModal.css'
 
 function GoogleIcon() {
@@ -193,7 +193,7 @@ export function WaitlistModal() {
       onClick={(e) => { if (e.target === backdropRef.current) close() }}
     >
       <div className="wm__panel" role="dialog" aria-modal="true" aria-label="Join the VERBION waitlist">
-        {CLERK_ENABLED ? (
+        {isClerkEnabled() ? (
           <ClerkModalContent close={close} />
         ) : (
           <>
