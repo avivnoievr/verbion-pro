@@ -35,7 +35,7 @@ export default function CTA() {
   )
 
   return (
-    <section id="preorder" ref={sectionRef} className="cta-section" data-brush>
+    <section id="preorder" ref={sectionRef} className="cta-section page-sheet" data-brush>
       <div className="cta-bg" />
       <div className="cta-gradient" />
       <div className="cta-vignette" />

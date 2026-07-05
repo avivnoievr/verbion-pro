@@ -39,6 +39,7 @@ export default function Macro() {
       poster={84}
       fadeIn
       fadeOut
+      sheet
       buildTimeline={buildTimeline}
     >
       <div className="section-eyebrow">
