@@ -1,0 +1,7 @@
+{
+  "installCommand": "npm --prefix verbion-v2.5 install",
+  "buildCommand": "npm --prefix verbion-v2.5 run build",
+  "outputDirectory": "verbion-v2.5/dist",
+  "framework": null,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
