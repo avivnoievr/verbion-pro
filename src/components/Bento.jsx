@@ -16,7 +16,7 @@ export default function Bento() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=180%',
+          end: '+=240%',
           scrub: 1.5,
           pin: true,
           anticipatePin: 1,
@@ -30,8 +30,8 @@ export default function Bento() {
 
       tl.fromTo(
         q('.bento-inner'),
-        { yPercent: 7, rotateX: -6, scale: 0.97, transformOrigin: '50% 100%' },
-        { yPercent: 0, rotateX: 0, scale: 1, duration: 0.08, ease: 'power1.out' },
+        { yPercent: 7, rotateX: -6, scale: 0.97, filter: 'blur(14px)', transformOrigin: '50% 100%' },
+        { yPercent: 0, rotateX: 0, scale: 1, filter: 'blur(0px)', duration: 0.09, ease: 'power1.out' },
         0,
       )
         .fromTo([card('a'), card('b')], { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.18 }, 0.05)
@@ -46,7 +46,7 @@ export default function Bento() {
         .fromTo(q('.bento-caption'), { opacity: 0, y: 18 }, { opacity: 0.6, y: 0, duration: 0.1 }, 0.82)
         .to(
           q('.bento-inner'),
-          { opacity: 0.1, yPercent: -6, rotateX: 8, scale: 0.93, transformOrigin: '50% 12%', duration: 0.08, ease: 'power1.in' },
+          { opacity: 0.1, yPercent: -6, rotateX: 8, scale: 0.93, filter: 'blur(14px)', transformOrigin: '50% 12%', duration: 0.08, ease: 'power1.in' },
           0.92,
         )
     },

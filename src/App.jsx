@@ -42,7 +42,7 @@ export default function App() {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) return undefined
 
-    const lenis = new Lenis({ duration: 1.15 })
+    const lenis = new Lenis({ duration: 1.3 })
     lenis.on('scroll', ScrollTrigger.update)
     const raf = (time) => lenis.raf(time * 1000)
     gsap.ticker.add(raf)

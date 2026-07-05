@@ -270,6 +270,7 @@ export default function FrameScrubSection({
           scrub,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
           onToggle: (self) => {
             inst.boost = staticMode || self.isActive
             if (self.isActive) {
@@ -292,8 +293,23 @@ export default function FrameScrubSection({
       if (fadeIn && !staticMode) {
         tl.fromTo(
           [mediaRef.current, overlayRef.current],
-          { opacity: 0.15, scale: 0.94, yPercent: 8, rotateX: -7, transformOrigin: '50% 100%' },
-          { opacity: 1, scale: 1, yPercent: 0, rotateX: 0, duration: 0.08, ease: 'power1.out' },
+          {
+            opacity: 0.15,
+            scale: 0.94,
+            yPercent: 8,
+            rotateX: -7,
+            filter: 'blur(16px) brightness(0.7)',
+            transformOrigin: '50% 100%',
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            yPercent: 0,
+            rotateX: 0,
+            filter: 'blur(0px) brightness(1)',
+            duration: 0.09,
+            ease: 'power1.out',
+          },
           0,
         )
       }
@@ -306,6 +322,7 @@ export default function FrameScrubSection({
             scale: 0.92,
             yPercent: -6,
             rotateX: 8,
+            filter: 'blur(16px) brightness(0.6)',
             transformOrigin: '50% 12%',
             duration: 1 - outAt,
             ease: 'power1.in',

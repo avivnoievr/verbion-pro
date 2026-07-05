@@ -14,8 +14,8 @@ const CALLOUTS = [
     value: 'Rinse under the tap · dock stays dry',
     anchor: [0.445, 0.22],
     mirror: true,
-    at: 0.09, // frame ~13
-    out: 0.3, // frame ~43, before the push-in
+    at: 0.08, // frame ~12
+    out: 0.315, // frame ~45, before the push-in
   },
   {
     // macro: gold spring pins on the bayonet ring
@@ -23,17 +23,19 @@ const CALLOUTS = [
     value: 'Power + telemetry · keyed bayonet',
     anchor: [0.475, 0.525],
     mirror: false,
-    at: 0.44, // frame ~64
-    out: 0.66, // frame ~95, before docking begins
+    at: 0.41, // frame ~59
+    out: 0.67, // frame ~97, before docking begins
   },
   {
-    // docking: cyan activation ring as the halves meet
+    // docking: cyan activation ring — the dot rides the ring down as
+    // the vessel seats (v 0.635 → 0.73), stays to the very end
     label: 'Locked & Live',
     value: 'Seated · sealed · ready to chill',
-    anchor: [0.5, 0.66],
+    anchor: [0.5, 0.635],
     mirror: false,
-    at: 0.78, // frame ~113
+    at: 0.76, // frame ~110
     out: null, // rides the section fade-out
+    track: { to: [0.5, 0.73], until: 1 },
   },
 ]
 
@@ -44,7 +46,7 @@ export default function Pogo() {
   const buildTimeline = (tl) => {
     tl.fromTo(subtitleRef.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.06, ease: 'power2.out' }, 0.1)
       .to(subtitleRef.current, { opacity: 0, y: -12, duration: 0.05, ease: 'power1.in' }, 0.36)
-    refs.current.forEach((el, i) => addCalloutBeats(tl, el, CALLOUTS[i].at, CALLOUTS[i].out))
+    refs.current.forEach((el, i) => addCalloutBeats(tl, el, CALLOUTS[i]))
   }
 
   return (
@@ -52,7 +54,7 @@ export default function Pogo() {
       id="dock"
       frameBase="/frames/pogo"
       frameCount={145}
-      pin="+=170%"
+      pin="+=230%"
       scrub={1}
       poster={128}
       fadeIn

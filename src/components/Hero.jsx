@@ -13,8 +13,9 @@ export default function Hero() {
     gsap.from(titleRef.current.querySelectorAll('.hero-letter'), {
       x: -40,
       opacity: 0,
-      stagger: 0.06,
-      duration: 0.8,
+      filter: 'blur(8px)',
+      stagger: 0.08,
+      duration: 1.05,
       delay: 0.15,
       ease: 'power3.out',
     })
@@ -30,7 +31,7 @@ export default function Hero() {
       id="top"
       frameBase="/frames/orbit"
       frameCount={72}
-      pin="+=120%"
+      pin="+=160%"
       scrub={1}
       fadeOut
       brush
