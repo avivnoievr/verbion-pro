@@ -15,12 +15,14 @@ export default function FrameScrubSection({
   fadeIn = false,
   fadeOut = false,
   brush = false,
+  sheet = false,
   children,
   buildTimeline,
 }) {
   const sectionRef = useRef(null)
   const canvasRef = useRef(null)
   const mediaRef = useRef(null)
+  const overlayRef = useRef(null)
 
   useGSAP(
     () => {
@@ -103,7 +105,7 @@ export default function FrameScrubSection({
       }
       if (fadeIn && !staticMode) {
         tl.fromTo(
-          mediaRef.current,
+          [mediaRef.current, overlayRef.current],
           { opacity: 0.15, scale: 0.94, yPercent: 8, rotateX: -7, transformOrigin: '50% 100%' },
           { opacity: 1, scale: 1, yPercent: 0, rotateX: 0, duration: 0.08, ease: 'power1.out' },
           0,
@@ -111,18 +113,17 @@ export default function FrameScrubSection({
       }
       if (fadeOut && !staticMode) {
         tl.to(
-          mediaRef.current,
+          [mediaRef.current, overlayRef.current],
           {
-            opacity: 0.12,
+            opacity: 0.1,
             scale: 0.92,
             yPercent: -6,
             rotateX: 8,
             transformOrigin: '50% 12%',
-            filter: 'brightness(0.5)',
-            duration: 0.08,
+            duration: 0.07,
             ease: 'power1.in',
           },
-          0.92,
+          0.93,
         )
       }
       buildTimeline?.(tl)
@@ -133,12 +134,17 @@ export default function FrameScrubSection({
   )
 
   return (
-    <section id={id} ref={sectionRef} className="scrub-section" data-brush={brush || undefined}>
+    <section
+      id={id}
+      ref={sectionRef}
+      className={`scrub-section${sheet ? ' page-sheet' : ''}`}
+      data-brush={brush || undefined}
+    >
       <div ref={mediaRef} className="scrub-media">
         <canvas ref={canvasRef} className="scrub-canvas" />
         <div className="scrub-vignette" />
       </div>
-      <div className="scrub-overlay">{children}</div>
+      <div ref={overlayRef} className="scrub-overlay">{children}</div>
     </section>
   )
 }

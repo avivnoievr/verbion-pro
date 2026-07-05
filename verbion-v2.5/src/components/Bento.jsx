@@ -54,7 +54,7 @@ export default function Bento() {
   )
 
   return (
-    <section ref={sectionRef} className="bento-section">
+    <section ref={sectionRef} className="bento-section page-sheet">
       <div className="bento-glow" />
       <div className="bento-inner">
         <div className="bento-grid">

@@ -49,7 +49,7 @@ export default function EngineeredCold() {
   )
 
   return (
-    <section ref={sectionRef} className="cold-section" data-brush>
+    <section ref={sectionRef} className="cold-section page-sheet" data-brush>
       <div className="slab3d cold-slab" aria-hidden="true">Bi₂Te₃</div>
       <div className="cold-content">
         <h2 className="cold-headline">
