@@ -15,7 +15,7 @@ export default function EngineeredCold() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=110%',
+          end: '+=150%',
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -30,8 +30,8 @@ export default function EngineeredCold() {
       gsap.set(q('.cold-word'), { clipPath: 'inset(100% 0% 0% 0%)' })
       tl.fromTo(
         q('.cold-content'),
-        { yPercent: 6, rotateX: -5, transformOrigin: '50% 100%' },
-        { yPercent: 0, rotateX: 0, duration: 0.08, ease: 'power1.out' },
+        { yPercent: 6, rotateX: -5, filter: 'blur(14px)', transformOrigin: '50% 100%' },
+        { yPercent: 0, rotateX: 0, filter: 'blur(0px)', duration: 0.09, ease: 'power1.out' },
         0,
       )
         .fromTo(q('.cold-slab'), { rotateX: 64, opacity: 0 }, { rotateX: 44, opacity: 1, duration: 0.9, ease: 'none' }, 0.06)
@@ -41,7 +41,7 @@ export default function EngineeredCold() {
         .fromTo(q('.cold-chip'), { opacity: 0 }, { opacity: 1, duration: 0.12 }, 0.78)
         .to(
           [q('.cold-content'), q('.cold-slab')],
-          { opacity: 0.08, yPercent: -6, rotateX: 8, transformOrigin: '50% 12%', duration: 0.08, ease: 'power1.in' },
+          { opacity: 0.08, yPercent: -6, rotateX: 8, filter: 'blur(14px)', transformOrigin: '50% 12%', duration: 0.08, ease: 'power1.in' },
           0.92,
         )
     },

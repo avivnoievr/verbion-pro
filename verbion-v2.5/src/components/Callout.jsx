@@ -38,8 +38,12 @@ export default function Callout({ label, value, anchor, mirror = false, innerRef
 // Standard reveal beats on a scrubbed 0..1 timeline: dot pops, line
 // draws toward the text, text rises. `out` optional — omit to let the
 // section's own fade-out carry it away. `speed` < 1 compresses the
-// cadence for beats that live near the end of a pin.
-export function addCalloutBeats(tl, el, at, out, speed = 1) {
+// reveal cadence for beats that live near the end of a pin.
+// `track: { to: [u1, v1], until }` glides the whole callout so the dot
+// FOLLOWS the part as it moves through the footage — deltas are in
+// image-space fractions, converted to px from the live cover-fit rect
+// (function-based values + invalidateOnRefresh keep it resize-safe).
+export function addCalloutBeats(tl, el, { at, out = null, speed = 1, anchor, track = null }) {
   if (!el) return
   const line = el.querySelector('.callout-line')
   const dot = el.querySelector('.callout-dot')
@@ -51,5 +55,25 @@ export function addCalloutBeats(tl, el, at, out, speed = 1) {
     .fromTo(dot, { scale: 0, transformOrigin: 'center' }, { scale: 1, duration: s(0.025) }, at)
     .to(line, { strokeDashoffset: 0, duration: s(0.05), ease: 'power1.out' }, at + s(0.015))
     .fromTo(text, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: s(0.045), ease: 'power2.out' }, at + s(0.04))
-  if (out) tl.to(el, { opacity: 0, y: -14, duration: 0.035, ease: 'power1.in' }, out)
+  // exit fades opacity only — x/y belong to the tracker below
+  if (out) tl.to(el, { opacity: 0, duration: 0.03, ease: 'power1.in' }, out)
+  if (track) {
+    const section = el.closest('.scrub-section')
+    const imgPx = (prop, fallback) =>
+      parseFloat(getComputedStyle(section).getPropertyValue(prop)) || fallback
+    const du = track.to[0] - anchor[0]
+    const dv = track.to[1] - anchor[1]
+    const until = track.until ?? out ?? 1
+    tl.fromTo(
+      el,
+      { x: 0, y: 0 },
+      {
+        x: () => du * imgPx('--img-w', section.clientWidth),
+        y: () => dv * imgPx('--img-h', section.clientHeight),
+        duration: Math.max(until - at, 0.01),
+        ease: 'none',
+      },
+      at,
+    )
+  }
 }
