@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "verbion",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "verbion-v2.5", "run", "dev"],
+      "port": 5173
+    }
+  ]
+}
