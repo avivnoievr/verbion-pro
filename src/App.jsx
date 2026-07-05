@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { useUser } from '@clerk/clerk-react'
-import { CLERK_ENABLED } from './lib/clerkAvailable'
+import { isClerkEnabled } from './lib/clerkAvailable'
 import { WaitlistProvider } from './context/WaitlistContext'
 import { WaitlistModal } from './components/WaitlistModal.jsx'
 import Nav from './components/Nav.jsx'
@@ -60,7 +60,7 @@ export default function App() {
 
   return (
     <WaitlistProvider>
-      {CLERK_ENABLED && <OAuthJoinedDetector setJoined={setOauthJoined} />}
+      {isClerkEnabled() && <OAuthJoinedDetector setJoined={setOauthJoined} />}
       {oauthJoined && (
         <div className="waitlist-toast" role="status">
           You're on the list — we'll be in touch.
