@@ -28,7 +28,13 @@ export default function Bento() {
         return
       }
 
-      tl.fromTo([card('a'), card('b')], { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.18 }, 0.05)
+      tl.fromTo(
+        q('.bento-inner'),
+        { yPercent: 7, rotateX: -6, scale: 0.97, transformOrigin: '50% 100%' },
+        { yPercent: 0, rotateX: 0, scale: 1, duration: 0.08, ease: 'power1.out' },
+        0,
+      )
+        .fromTo([card('a'), card('b')], { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.18 }, 0.05)
         .fromTo([card('c'), card('d')], { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.18 }, 0.27)
         .fromTo(
           [card('e'), card('f')],
@@ -38,7 +44,11 @@ export default function Bento() {
         )
         .fromTo([card('g'), card('h')], { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.18 }, 0.7)
         .fromTo(q('.bento-caption'), { opacity: 0, y: 18 }, { opacity: 0.6, y: 0, duration: 0.1 }, 0.82)
-        .to([q('.bento-inner'), q('.bento-video')], { opacity: 0, duration: 0.06, ease: 'none' }, 0.94)
+        .to(
+          q('.bento-inner'),
+          { opacity: 0.1, yPercent: -6, rotateX: 8, scale: 0.93, transformOrigin: '50% 12%', duration: 0.08, ease: 'power1.in' },
+          0.92,
+        )
     },
     { scope: sectionRef },
   )
@@ -46,7 +56,6 @@ export default function Bento() {
   return (
     <section ref={sectionRef} className="bento-section">
       <div className="bento-glow" />
-      <video className="bento-video" src="/videos/ambient2.mp4" autoPlay muted loop playsInline />
       <div className="bento-inner">
         <div className="bento-grid">
           <div className="bento-card card-a">

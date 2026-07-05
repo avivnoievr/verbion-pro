@@ -39,6 +39,7 @@ export default function CTA() {
       <div className="cta-bg" />
       <div className="cta-gradient" />
       <div className="cta-vignette" />
+      <div className="slab3d cta-slab" aria-hidden="true">V 2.5</div>
       <RockBed />
       <div className="cta-content">
         <h2 className="cta-word cta-word-1">COLD.</h2>

@@ -102,10 +102,28 @@ export default function FrameScrubSection({
         )
       }
       if (fadeIn && !staticMode) {
-        tl.fromTo(mediaRef.current, { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0)
+        tl.fromTo(
+          mediaRef.current,
+          { opacity: 0.15, scale: 0.94, yPercent: 8, rotateX: -7, transformOrigin: '50% 100%' },
+          { opacity: 1, scale: 1, yPercent: 0, rotateX: 0, duration: 0.08, ease: 'power1.out' },
+          0,
+        )
       }
       if (fadeOut && !staticMode) {
-        tl.to(mediaRef.current, { opacity: 0, duration: 0.06 }, 0.94)
+        tl.to(
+          mediaRef.current,
+          {
+            opacity: 0.12,
+            scale: 0.92,
+            yPercent: -6,
+            rotateX: 8,
+            transformOrigin: '50% 12%',
+            filter: 'brightness(0.5)',
+            duration: 0.08,
+            ease: 'power1.in',
+          },
+          0.92,
+        )
       }
       buildTimeline?.(tl)
 
