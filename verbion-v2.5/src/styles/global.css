@@ -124,6 +124,15 @@ a { color: inherit; text-decoration: none; }
   box-shadow: none;
 }
 
+/* Seamless entry: while a section slides over the pinned one beneath,
+   its top edge is feathered away by a scrubbed mask (--feather goes
+   48vh -> 0 across the transit), so there is never a visible line —
+   the two sections blend into each other. */
+.scrub-section, .ring-section, .cold-section {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--feather, 0px));
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--feather, 0px));
+}
+
 /* ============ FRAME SCRUB SECTIONS ============ */
 .scrub-section { position: relative; height: 100vh; overflow: hidden; background: var(--bg); perspective: 1200px; }
 .scrub-media { position: absolute; inset: 0; overflow: hidden; will-change: transform, opacity; }
@@ -131,9 +140,9 @@ a { color: inherit; text-decoration: none; }
 .scrub-vignette {
   position: absolute; inset: 0; pointer-events: none;
   background:
-    linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0) 22%),
-    linear-gradient(to bottom, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 14%),
-    radial-gradient(140% 140% at 50% 50%, rgba(10,10,10,0) 52%, rgba(10,10,10,0.62) 100%);
+    linear-gradient(to top, rgba(10,10,10,0.62) 0%, rgba(10,10,10,0) 20%),
+    linear-gradient(to bottom, rgba(10,10,10,0.38) 0%, rgba(10,10,10,0) 12%),
+    radial-gradient(140% 140% at 50% 50%, rgba(10,10,10,0) 58%, rgba(10,10,10,0.4) 100%);
 }
 .scrub-overlay { position: absolute; inset: 0; z-index: 10; pointer-events: none; will-change: transform, opacity; }
 
@@ -306,12 +315,12 @@ a { color: inherit; text-decoration: none; }
 .ring-section {
   position: relative; height: 100vh; overflow: hidden;
   background:
-    radial-gradient(62% 78% at 42% 42%, #0F2133 0%, #0B141E 46%, #0A0A0A 76%),
+    radial-gradient(62% 78% at 42% 42%, #1A3A57 0%, #12202E 46%, #0E1218 78%),
     var(--bg);
 }
 .ring-glow {
   position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(150% 150% at 50% 50%, rgba(10,10,10,0) 50%, rgba(0,0,0,0.82) 100%);
+  background: radial-gradient(150% 150% at 50% 50%, rgba(10,10,10,0) 58%, rgba(0,0,0,0.5) 100%);
 }
 .ring-scene {
   position: absolute;
@@ -441,7 +450,7 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   height: 100vh;
   background:
-    radial-gradient(58% 74% at 56% 38%, #102940 0%, #0B1622 46%, #0A0A0A 78%),
+    radial-gradient(58% 74% at 56% 38%, #1A4066 0%, #12222F 46%, #0E1116 78%),
     var(--bg);
   display: flex;
   flex-direction: column;
@@ -453,7 +462,7 @@ a { color: inherit; text-decoration: none; }
 .cold-section::after {
   content: '';
   position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(150% 150% at 50% 50%, rgba(10,10,10,0) 48%, rgba(0,0,0,0.82) 100%);
+  background: radial-gradient(150% 150% at 50% 50%, rgba(10,10,10,0) 56%, rgba(0,0,0,0.5) 100%);
 }
 .cold-content { position: relative; z-index: 2; will-change: opacity, transform; }
 .cold-headline {
