@@ -65,8 +65,9 @@ export default function XRay() {
       pin="+=320%"
       scrub={1}
       poster={330}
-      fadeIn
+      fadeIn="iris"
       fadeOut={0.955}
+      exitFx="whiteout"
       sheet
       buildTimeline={buildTimeline}
     >

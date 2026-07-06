@@ -59,7 +59,7 @@ export default function Macro() {
       scrub={1}
       poster={84}
       filmEnd={0.62}
-      fadeIn
+      fadeIn="rise"
       sheet
       brush
       buildTimeline={buildTimeline}

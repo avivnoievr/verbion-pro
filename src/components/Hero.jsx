@@ -34,6 +34,7 @@ export default function Hero() {
       pin="+=160%"
       scrub={1}
       fadeOut
+      exitFx="push"
       brush
       buildTimeline={buildTimeline}
     >
