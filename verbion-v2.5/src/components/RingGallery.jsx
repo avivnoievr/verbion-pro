@@ -9,15 +9,19 @@ import { useGSAP } from '@gsap/react'
 const CARDS = [
   { img: '/images/bento/a.webp', alt: 'VERBION bottle with live data streams' },
   { text: '10°C', sub: 'Precision target', tone: 'cyan' },
+  { img: '/images/gallery/cliff.webp', alt: 'Bottle on a granite ledge at a sunrise cliff, climbing rope beside it' },
   { img: '/images/bento/c.webp', alt: 'Runner at golden hour with the bottle' },
   { img: '/images/gallery/oled-macro.webp', alt: 'OLED status screen macro' },
   { text: '30W', sub: 'Solid-state cooling', tone: 'amber' },
+  { img: '/images/gallery/camp.webp', alt: 'Bottle glowing on a camping table at dusk' },
   { img: '/images/bento/pogo.webp', alt: 'Two-module pogo connector' },
   { img: '/images/bento/h.webp', alt: 'Bottle in a backpack on a forest trail' },
   { text: 'IP67', sub: 'Sealed power dock', tone: 'cyan' },
+  { img: '/images/gallery/gym.webp', alt: 'Bottle with condensation on a gym floor beside dumbbells' },
   { img: '/images/gallery/run-park.webp', alt: 'Morning run with the bottle in hand' },
   { img: '/images/bento/f.webp', alt: 'Bottle on a window ledge, city bokeh' },
   { text: 'BLE 5.2', sub: 'Live telemetry', tone: 'amber' },
+  { img: '/images/gallery/bike.webp', alt: 'Bottle leaning on a mountain bike wheel on a forest trail' },
   { img: '/images/bento/b.webp', alt: 'Bottle on a café table' },
 ]
 
@@ -31,7 +35,7 @@ const USES = [
 ]
 
 const N = CARDS.length
-const RADIUS = 360
+const RADIUS = 470
 
 export default function RingGallery() {
   const sectionRef = useRef(null)
