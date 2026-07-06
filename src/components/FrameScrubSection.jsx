@@ -309,6 +309,18 @@ export default function FrameScrubSection({
         scheduleDecodes()
       }
 
+      // feather the top edge away while sliding over the section beneath
+      gsap.fromTo(
+        section,
+        { '--feather': '48vh' },
+        {
+          '--feather': '0vh',
+          ease: 'none',
+          immediateRender: true,
+          scrollTrigger: { trigger: section, start: 'top 99.9%', end: 'top top', scrub: true },
+        },
+      )
+
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {

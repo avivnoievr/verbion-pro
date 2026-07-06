@@ -41,6 +41,18 @@ export default function RingGallery() {
       const q = gsap.utils.selector(sectionRef)
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+      // feather the top edge away while sliding over the hero
+      gsap.fromTo(
+        sectionRef.current,
+        { '--feather': '48vh' },
+        {
+          '--feather': '0vh',
+          ease: 'none',
+          immediateRender: true,
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
+        },
+      )
+
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
