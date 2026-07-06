@@ -116,15 +116,17 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ============ PAGE SHEETS ============ */
+/* Seams killed on purpose: no radius, no edge, no shadow — sections
+   must read as one continuous surface. The class stays as a marker. */
 .page-sheet {
-  border-radius: clamp(20px, 3vw, 36px) clamp(20px, 3vw, 36px) 0 0;
-  border-top: 1px solid rgba(244, 239, 232, 0.08);
-  box-shadow: 0 -34px 70px rgba(0, 0, 0, 0.72);
+  border-radius: 0;
+  border-top: none;
+  box-shadow: none;
 }
 
 /* ============ FRAME SCRUB SECTIONS ============ */
 .scrub-section { position: relative; height: 100vh; overflow: hidden; background: var(--bg); perspective: 1200px; }
-.scrub-media { position: absolute; inset: 0; will-change: transform, opacity; }
+.scrub-media { position: absolute; inset: 0; overflow: hidden; will-change: transform, opacity; }
 .scrub-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .scrub-vignette {
   position: absolute; inset: 0; pointer-events: none;
@@ -298,6 +300,140 @@ a { color: inherit; text-decoration: none; }
     height: auto;
   }
   .bento-inner { padding-top: 80px; overflow-y: auto; }
+}
+
+/* ============ RING GALLERY ============ */
+.ring-section {
+  position: relative; height: 100vh; overflow: hidden;
+  background:
+    radial-gradient(62% 78% at 42% 42%, #0F2133 0%, #0B141E 46%, #0A0A0A 76%),
+    var(--bg);
+}
+.ring-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(150% 150% at 50% 50%, rgba(10,10,10,0) 50%, rgba(0,0,0,0.82) 100%);
+}
+.ring-scene {
+  position: absolute;
+  left: 0; top: 0; width: 62%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  perspective: 1500px;
+  will-change: transform, opacity;
+}
+.ring {
+  position: relative;
+  width: 200px; height: 260px;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.ring-card {
+  position: absolute; inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #101418;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  backface-visibility: visible;
+}
+.ring-card img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.ring-card--text {
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+}
+.ring-card--text .big {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--bg);
+}
+.ring-card--text .small {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 10, 0.82);
+  margin-top: 8px;
+}
+.ring-copy {
+  position: absolute;
+  right: clamp(24px, 5vw, 80px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(34vw, 420px);
+  z-index: 10;
+}
+.ring-copy h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(30px, 3.4vw, 52px);
+  line-height: 1.04;
+  color: var(--cream);
+  margin-bottom: 30px;
+  opacity: 0;
+}
+.ring-use { margin-bottom: 20px; opacity: 0; will-change: transform, opacity; }
+.ring-use-t {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.ring-use-d {
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--gray);
+  margin-top: 4px;
+  line-height: 1.55;
+}
+@media (max-width: 767px) {
+  .ring-scene { width: 100%; }
+  .ring-copy { position: relative; right: auto; top: auto; transform: none; width: auto; padding: 80px 24px 0; }
+}
+
+/* ============ ATOM / FLASH / LIGHTNING ============ */
+.atom-stage {
+  position: absolute; inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.atom-stage canvas { display: block; }
+.atom-flash {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 130vmax; height: 130vmax;
+  margin: -65vmax 0 0 -65vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(235, 255, 255, 0.96) 30%,
+    rgba(120, 245, 245, 0.6) 52%,
+    rgba(0, 229, 229, 0.22) 66%,
+    rgba(10, 10, 10, 0) 78%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  z-index: 8;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.cold-float {
+  font-size: clamp(22px, 2.4vw, 40px);
+  -webkit-text-stroke-color: rgba(0, 184, 184, 0.35);
+  opacity: 0;
+}
+.cold-float-1 { left: 12%; top: 22%; transform: rotateX(38deg) rotateZ(-8deg); }
+.cold-float-2 { left: 68%; top: 66%; transform: rotateX(48deg) rotateZ(10deg); }
+.lightning-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 30;
+  pointer-events: none;
 }
 
 /* ============ ENGINEERED COLD ============ */

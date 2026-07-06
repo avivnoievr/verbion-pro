@@ -41,9 +41,10 @@ const ENTER_FX = {
     { opacity: 0.15, scale: 0.94, yPercent: 8, rotateX: -7, filter: 'blur(16px) brightness(0.7)', transformOrigin: '50% 100%' },
     { opacity: 1, scale: 1, yPercent: 0, rotateX: 0, filter: 'blur(0px) brightness(1)' },
   ],
-  // iris reveal — entering the machine through a widening circle
+  // iris reveal — entering the machine through a widening circle,
+  // opening hot to receive the atom's light burst
   iris: [
-    { opacity: 0.35, scale: 1.08, clipPath: 'circle(14% at 50% 52%)', filter: 'blur(8px) brightness(1.15)' },
+    { opacity: 0.35, scale: 1.08, clipPath: 'circle(14% at 50% 52%)', filter: 'blur(8px) brightness(1.6)' },
     { opacity: 1, scale: 1, clipPath: 'circle(142% at 50% 52%)', filter: 'blur(0px) brightness(1)' },
   ],
   // over-exposed settle — lights coming up into the white studio
@@ -66,6 +67,17 @@ const EXIT_FX = {
   whiteout: { opacity: 0.3, scale: 1.05, filter: 'blur(20px) brightness(2.4)' },
   // dusk dip into a dark scene
   dusk: { opacity: 0.08, scale: 0.94, yPercent: -4, filter: 'blur(14px) brightness(0.35)', transformOrigin: '50% 12%' },
+  // the page balls up and vanishes into the bottom-left corner —
+  // the gallery chain unfurls from that same corner
+  warp: {
+    opacity: 0.25,
+    scale: 0.1,
+    xPercent: -40,
+    yPercent: 34,
+    borderRadius: '50%',
+    filter: 'blur(10px) brightness(0.8)',
+    transformOrigin: '50% 50%',
+  },
 }
 
 // Pinned full-viewport section whose canvas scrubs a WebP frame

@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import FrameScrubSection from './FrameScrubSection.jsx'
 import Callout, { addCalloutBeats } from './Callout.jsx'
+import LightningIris from './LightningIris.jsx'
 
 // Timing is phase-locked to the concatenated 386-frame sequence
 // (t = frame / 385): video1 (spiral→wires) 0–0.374, video2 (dissolve)
@@ -49,8 +50,17 @@ const CALLOUTS = [
 export default function XRay() {
   const refs = useRef([])
   const subtitleRef = useRef(null)
+  const lightningRef = useRef(null)
 
   const buildTimeline = (tl) => {
+    // electric arcs drag the iris open across the entry window
+    const arc = { p: 0 }
+    tl.to(arc, {
+      p: 1,
+      duration: 0.14,
+      ease: 'none',
+      onUpdate: () => lightningRef.current?.draw(arc.p),
+    }, 0)
     // telemetry line lives inside the AI-bridge phase (video2)
     tl.fromTo(subtitleRef.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.06, ease: 'power2.out' }, 0.4)
       .to(subtitleRef.current, { opacity: 0, y: -12, duration: 0.05, ease: 'power1.in' }, 0.58)
@@ -71,6 +81,7 @@ export default function XRay() {
       sheet
       buildTimeline={buildTimeline}
     >
+      <LightningIris ref={lightningRef} />
       <div className="section-eyebrow">
         Intelligent Power Dock
         <strong>The cooling engine, exposed.</strong>
