@@ -9,7 +9,7 @@ import { WaitlistModal } from './components/WaitlistModal.jsx'
 import Nav from './components/Nav.jsx'
 import BrushCursor from './components/BrushCursor.jsx'
 import Hero from './components/Hero.jsx'
-import Bento from './components/Bento.jsx'
+import RingGallery from './components/RingGallery.jsx'
 import EngineeredCold from './components/EngineeredCold.jsx'
 import XRay from './components/XRay.jsx'
 import Pogo from './components/Pogo.jsx'
@@ -70,7 +70,7 @@ export default function App() {
       <BrushCursor />
       <main>
         <Hero />
-        <Bento />
+        <RingGallery />
         <EngineeredCold />
         <XRay />
         <Pogo />

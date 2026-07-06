@@ -33,8 +33,8 @@ export default function Hero() {
       frameCount={72}
       pin="+=160%"
       scrub={1}
-      fadeOut
-      exitFx="push"
+      fadeOut={0.9}
+      exitFx="warp"
       brush
       buildTimeline={buildTimeline}
     >
