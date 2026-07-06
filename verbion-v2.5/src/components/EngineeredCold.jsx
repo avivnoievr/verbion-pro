@@ -27,11 +27,13 @@ export default function EngineeredCold() {
         return
       }
 
-      gsap.set(q('.cold-word'), { clipPath: 'inset(100% 0% 0% 0%)' })
+      // horizontal wipe matches the lateral pan from the bento grid
+      gsap.set(q('.cold-word'), { clipPath: 'inset(0% 100% 0% 0%)' })
+      // answers the bento's leftward sweep: content glides in from the right
       tl.fromTo(
         q('.cold-content'),
-        { yPercent: 6, rotateX: -5, filter: 'blur(14px)', transformOrigin: '50% 100%' },
-        { yPercent: 0, rotateX: 0, filter: 'blur(0px)', duration: 0.09, ease: 'power1.out' },
+        { xPercent: 10, rotateY: -9, filter: 'blur(14px)', transformOrigin: '100% 50%' },
+        { xPercent: 0, rotateY: 0, filter: 'blur(0px)', duration: 0.09, ease: 'power1.out' },
         0,
       )
         .fromTo(q('.cold-slab'), { rotateX: 64, opacity: 0 }, { rotateX: 44, opacity: 1, duration: 0.9, ease: 'none' }, 0.06)
@@ -39,9 +41,11 @@ export default function EngineeredCold() {
         .fromTo(q('.cold-sub'), { opacity: 0, y: 24 }, { opacity: 0.6, y: 0, duration: 0.16, ease: 'power2.out' }, 0.48)
         .fromTo(q('.cold-detail'), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.14, ease: 'power2.out' }, 0.62)
         .fromTo(q('.cold-chip'), { opacity: 0 }, { opacity: 1, duration: 0.12 }, 0.78)
+        // frost bloom out — a cold flash of light before the iris into
+        // the engine film
         .to(
           [q('.cold-content'), q('.cold-slab')],
-          { opacity: 0.08, yPercent: -6, rotateX: 8, filter: 'blur(14px)', transformOrigin: '50% 12%', duration: 0.08, ease: 'power1.in' },
+          { opacity: 0.06, scale: 1.05, filter: 'blur(16px) brightness(1.7)', transformOrigin: '50% 50%', duration: 0.08, ease: 'power1.in' },
           0.92,
         )
     },

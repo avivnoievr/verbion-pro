@@ -33,6 +33,41 @@ function pumpFetch() {
 const LADDER = 6 // low-res keyframe cadence
 const LOW_W = 480 // low-res ladder decode width
 
+// Each boundary between sections gets its own motion language so the
+// scroll reads as one continuous journey, not page changes.
+const ENTER_FX = {
+  // soft defocus rise (the original)
+  blur: [
+    { opacity: 0.15, scale: 0.94, yPercent: 8, rotateX: -7, filter: 'blur(16px) brightness(0.7)', transformOrigin: '50% 100%' },
+    { opacity: 1, scale: 1, yPercent: 0, rotateX: 0, filter: 'blur(0px) brightness(1)' },
+  ],
+  // iris reveal — entering the machine through a widening circle
+  iris: [
+    { opacity: 0.35, scale: 1.08, clipPath: 'circle(14% at 50% 52%)', filter: 'blur(8px) brightness(1.15)' },
+    { opacity: 1, scale: 1, clipPath: 'circle(142% at 50% 52%)', filter: 'blur(0px) brightness(1)' },
+  ],
+  // over-exposed settle — lights coming up into the white studio
+  bloom: [
+    { opacity: 0.45, scale: 1.06, filter: 'blur(18px) brightness(2.2)' },
+    { opacity: 1, scale: 1, filter: 'blur(0px) brightness(1)' },
+  ],
+  // frost rising from the bottom edge
+  rise: [
+    { opacity: 0.5, yPercent: 3, clipPath: 'inset(70% 0% 0% 0%)', filter: 'blur(10px) brightness(0.8)' },
+    { opacity: 1, yPercent: 0, clipPath: 'inset(0% 0% 0% 0%)', filter: 'blur(0px) brightness(1)' },
+  ],
+}
+const EXIT_FX = {
+  // defocus retreat (the original)
+  blur: { opacity: 0.1, scale: 0.92, yPercent: -6, rotateX: 8, filter: 'blur(16px) brightness(0.6)', transformOrigin: '50% 12%' },
+  // camera pushes THROUGH the subject into the next scene
+  push: { opacity: 0.12, scale: 1.16, filter: 'blur(18px) brightness(0.85)', transformOrigin: '50% 45%' },
+  // exposure white-out into a bright scene
+  whiteout: { opacity: 0.3, scale: 1.05, filter: 'blur(20px) brightness(2.4)' },
+  // dusk dip into a dark scene
+  dusk: { opacity: 0.08, scale: 0.94, yPercent: -4, filter: 'blur(14px) brightness(0.35)', transformOrigin: '50% 12%' },
+}
+
 // Pinned full-viewport section whose canvas scrubs a WebP frame
 // sequence with scroll. Frames decode into a sliding window of
 // ImageBitmaps around the playhead (GPU-cheap to draw), backed by a
@@ -49,8 +84,9 @@ export default function FrameScrubSection({
   scrub = 1,
   poster = 0,
   filmEnd = 1,
-  fadeIn = false,
-  fadeOut = false,
+  fadeIn = false, // false | true ('blur') | ENTER_FX variant name
+  fadeOut = false, // false | true | fade-out start position 0..1
+  exitFx = 'blur', // EXIT_FX variant name
   brush = false,
   sheet = false,
   tone,
@@ -291,25 +327,11 @@ export default function FrameScrubSection({
         if (filmEnd < 1) tl.to({}, { duration: 1 - filmEnd }, filmEnd)
       }
       if (fadeIn && !staticMode) {
+        const [from, to] = ENTER_FX[typeof fadeIn === 'string' ? fadeIn : 'blur']
         tl.fromTo(
           [mediaRef.current, overlayRef.current],
-          {
-            opacity: 0.15,
-            scale: 0.94,
-            yPercent: 8,
-            rotateX: -7,
-            filter: 'blur(16px) brightness(0.7)',
-            transformOrigin: '50% 100%',
-          },
-          {
-            opacity: 1,
-            scale: 1,
-            yPercent: 0,
-            rotateX: 0,
-            filter: 'blur(0px) brightness(1)',
-            duration: 0.09,
-            ease: 'power1.out',
-          },
+          from,
+          { ...to, duration: 0.09, ease: 'power1.out' },
           0,
         )
       }
@@ -317,16 +339,7 @@ export default function FrameScrubSection({
         const outAt = typeof fadeOut === 'number' ? fadeOut : 0.93
         tl.to(
           [mediaRef.current, overlayRef.current],
-          {
-            opacity: 0.1,
-            scale: 0.92,
-            yPercent: -6,
-            rotateX: 8,
-            filter: 'blur(16px) brightness(0.6)',
-            transformOrigin: '50% 12%',
-            duration: 1 - outAt,
-            ease: 'power1.in',
-          },
+          { ...EXIT_FX[exitFx], duration: 1 - outAt, ease: 'power1.in' },
           outAt,
         )
       }

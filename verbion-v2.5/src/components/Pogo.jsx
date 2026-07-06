@@ -57,8 +57,9 @@ export default function Pogo() {
       pin="+=230%"
       scrub={1}
       poster={128}
-      fadeIn
+      fadeIn="bloom"
       fadeOut
+      exitFx="dusk"
       sheet
       tone="light"
       buildTimeline={buildTimeline}
