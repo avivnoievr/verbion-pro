@@ -97,6 +97,8 @@ export default function FrameScrubSection({
   frameCount,
   pin = '+=150%',
   hold = true, // stay pinned one extra viewport while the next scene slides over
+  // הסצנה הראשונה בדף אין לה על מה להימוג — היא חייבת להיות שם מיד
+  dissolveIn = true,
   scrub = 1,
   poster = 0,
   filmEnd = 1,
@@ -318,19 +320,36 @@ export default function FrameScrubSection({
         scheduleDecodes()
       }
 
-      // feather the top edge away while sliding over the scene beneath.
-      // IMPORTANT: the trigger is the WRAPPER, never the sticky section —
-      // a sticky element measured mid-stick gives garbage positions.
-      gsap.fromTo(
-        section,
-        { '--feather': '62vh' },
-        {
-          '--feather': '0vh',
-          ease: 'none',
-          immediateRender: true,
-          scrollTrigger: { trigger: sceneRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
-        },
-      )
+      // ===== דיזולב במקום החלקה =====
+      // הסקשן דביק, אבל עד שהעטיפה מגיעה לראש המסך הוא יושב נמוך
+      // יותר ונדחף מלמטה כלוח עם קצה חד. ה-y מבטל את ההיסט בדיוק
+      // (‎-100vh ➜ 0 על אותו חלון גלילה), כך שהשכבה נראית נעוצה
+      // לראש המסך והמעבר כולו קורה בשקיפות.
+      //
+      // אין קצה שנכנס ➜ אין מה להמיס ➜ ה-feather מיותר. זה מוריד
+      // חלק נע שלם מהסנכרון, וזה בדיוק החלק שהתפר חזר ממנו בעבר.
+      //
+      // ⚠️ הטריגר תמיד על העטיפה, לעולם לא על הסקשן הדביק —
+      // מדידה של אלמנט sticky באמצע ההידבקות מחזירה זבל.
+      if (dissolveIn) {
+        gsap.fromTo(
+          section,
+          { y: () => -window.innerHeight, opacity: 0, '--feather': '0vh' },
+          {
+            y: 0,
+            opacity: 1,
+            ease: 'none',
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: sceneRef.current,
+              start: 'top bottom',
+              end: 'top top',
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        )
+      }
 
       // Sticky scene (one-page method §3.2): the wrapper supplies the
       // scroll length, the section just sticks. The film timeline spans

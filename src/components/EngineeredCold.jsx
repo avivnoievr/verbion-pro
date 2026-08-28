@@ -16,15 +16,24 @@ export default function EngineeredCold() {
       const q = gsap.utils.selector(sectionRef)
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-      // feather the top edge away while sliding over the gallery
+      // דיזולב במקום החלקה — ראה ההסבר המלא ב-FrameScrubSection.
+      // ה-y מבטל את ההיסט של sticky שעוד לא נתפסה, כך שהשכבה נראית
+      // נעוצה לראש המסך וכל המעבר קורה בשקיפות. אין קצה ➜ אין feather.
       gsap.fromTo(
         sectionRef.current,
-        { '--feather': '62vh' },
+        { y: () => -window.innerHeight, opacity: 0, '--feather': '0vh' },
         {
-          '--feather': '0vh',
+          y: 0,
+          opacity: 1,
           ease: 'none',
           immediateRender: true,
-          scrollTrigger: { trigger: sceneRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
+          scrollTrigger: {
+            trigger: sceneRef.current,
+            start: 'top bottom',
+            end: 'top top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
         },
       )
 

@@ -32,6 +32,7 @@ export default function Hero() {
       frameBase="/frames/orbit"
       frameCount={72}
       pin="+=160%"
+      dissolveIn={false}
       scrub={1}
       fadeOut={0.9}
       exitFx="warp"
