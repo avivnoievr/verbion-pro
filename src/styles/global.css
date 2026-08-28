@@ -162,6 +162,18 @@ a { color: inherit; text-decoration: none; }
 .scene { position: relative; }
 .scene > section { position: sticky; top: 0; }
 
+/* ⚠️ החפיפה שהתיעוד למעלה מתאר — היא לא הייתה מומשת.
+   כל .scene גבוהה ב-100vh ממה שהסקשן הדביק מכסה (ה"החזקה"),
+   ובלי החפיפה הזאת הסקשן מתנתק מהנעיצה ומחליק החוצה אל
+   עטיפה ריקה — משם החור השחור והתפר הקשה בין הסצנות.
+   הסצנה הבאה חייבת לעלות בדיוק על אותם 100vh. */
+.scene + .scene { margin-top: -100vh; }
+
+/* לסצנה האחרונה אין מי שיכסה את ה"החזקה" שלה, אז הדף נגמר על
+   מסך ריק. מקצצים אותה מגובה המסמך.
+   ⚠️ לא :last-of-type — יש <div> ריק אחרי הסצנות והוא תופס אותו. */
+.scene:not(:has(~ .scene)) { margin-bottom: -100vh; }
+
 /* Seamless entry: while a section slides over the pinned one beneath,
    its top edge is feathered away by a scrubbed mask (--feather goes
    48vh -> 0 across the transit), so there is never a visible line —
