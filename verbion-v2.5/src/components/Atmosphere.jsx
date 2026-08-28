@@ -13,10 +13,11 @@ export default function Atmosphere() {
   useGSAP(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) return
-    const sections = gsap.utils.toArray('main .scene > section').slice(1)
-    sections.forEach((sec) => {
+    // trigger on the stable wrappers, never the sticky sections
+    const scenes = gsap.utils.toArray('main > .scene').slice(1)
+    scenes.forEach((sc) => {
       gsap.timeline({
-        scrollTrigger: { trigger: sec, start: 'top 99.9%', end: 'top top', scrub: true },
+        scrollTrigger: { trigger: sc, start: 'top 99.9%', end: 'top top', scrub: true },
       })
         .fromTo(veilRef.current, { opacity: 0 }, { opacity: 0.32, duration: 0.45, ease: 'none', immediateRender: false }, 0)
         .to(veilRef.current, { opacity: 0, duration: 0.55, ease: 'none' }, 0.45)

@@ -54,7 +54,7 @@ export default function RingGallery() {
           '--feather': '0vh',
           ease: 'none',
           immediateRender: true,
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
+          scrollTrigger: { trigger: sceneRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
         },
       )
 
