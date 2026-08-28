@@ -56,6 +56,7 @@ export default function Macro() {
       frameBase="/frames/macro"
       frameCount={88}
       pin="+=400%"
+      hold={false}
       scrub={1}
       poster={84}
       filmEnd={0.62}

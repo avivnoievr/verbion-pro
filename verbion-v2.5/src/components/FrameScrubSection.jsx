@@ -58,15 +58,18 @@ const ENTER_FX = {
     { opacity: 1, yPercent: 0, clipPath: 'inset(0% 0% 0% 0%)', filter: 'blur(0px) brightness(1)' },
   ],
 }
+// exits end HALF-VISIBLE on purpose: the finished scene stays frozen
+// beneath the next one, and the incoming feathered edge must dissolve
+// into a scene you can still see — never into black
 const EXIT_FX = {
   // defocus retreat (the original)
-  blur: { opacity: 0.1, scale: 0.92, yPercent: -6, rotateX: 8, filter: 'blur(16px) brightness(0.6)', transformOrigin: '50% 12%' },
+  blur: { opacity: 0.55, scale: 0.95, yPercent: -4, rotateX: 5, filter: 'blur(14px) brightness(0.75)', transformOrigin: '50% 12%' },
   // camera pushes THROUGH the subject into the next scene
-  push: { opacity: 0.12, scale: 1.16, filter: 'blur(18px) brightness(0.85)', transformOrigin: '50% 45%' },
+  push: { opacity: 0.5, scale: 1.16, filter: 'blur(16px) brightness(0.85)', transformOrigin: '50% 45%' },
   // exposure white-out into a bright scene
-  whiteout: { opacity: 0.3, scale: 1.05, filter: 'blur(20px) brightness(2.4)' },
+  whiteout: { opacity: 0.6, scale: 1.05, filter: 'blur(20px) brightness(2.2)' },
   // dusk dip into a dark scene
-  dusk: { opacity: 0.08, scale: 0.94, yPercent: -4, filter: 'blur(14px) brightness(0.35)', transformOrigin: '50% 12%' },
+  dusk: { opacity: 0.5, scale: 0.96, yPercent: -3, filter: 'blur(14px) brightness(0.5)', transformOrigin: '50% 12%' },
   // the page balls up and vanishes into the bottom-left corner —
   // the gallery chain unfurls from that same corner
   warp: {
@@ -93,6 +96,7 @@ export default function FrameScrubSection({
   frameBase,
   frameCount,
   pin = '+=150%',
+  hold = true, // stay pinned one extra viewport while the next scene slides over
   scrub = 1,
   poster = 0,
   filmEnd = 1,
@@ -105,10 +109,15 @@ export default function FrameScrubSection({
   children,
   buildTimeline,
 }) {
+  const sceneRef = useRef(null)
   const sectionRef = useRef(null)
   const canvasRef = useRef(null)
   const mediaRef = useRef(null)
   const overlayRef = useRef(null)
+  const pinPctNum = parseFloat(String(pin).replace(/[^\d.]/g, '')) || 150
+  // wrapper height = 1 viewport (the sticky scene) + film distance
+  // (+1 extra viewport of frozen hold while the next scene covers us)
+  const sceneHeight = `calc(${100 + pinPctNum + (hold ? 100 : 0)}vh)`
 
   useGSAP(
     () => {
@@ -312,7 +321,7 @@ export default function FrameScrubSection({
       // feather the top edge away while sliding over the section beneath
       gsap.fromTo(
         section,
-        { '--feather': '48vh' },
+        { '--feather': '62vh' },
         {
           '--feather': '0vh',
           ease: 'none',
@@ -321,15 +330,20 @@ export default function FrameScrubSection({
         },
       )
 
+      // Sticky scene (one-page method §3.2): the wrapper supplies the
+      // scroll length, the section just sticks. The film timeline spans
+      // the wrapper minus the hold viewport, so with hold=true the
+      // finished scene stays frozen beneath the next one sliding over.
+      const pinPct = parseFloat(String(pin).replace(/[^\d.]/g, '')) || 150
+      const filmDist = () => Math.round((pinPct / 100) * window.innerHeight)
+
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
-          trigger: section,
+          trigger: sceneRef.current,
           start: 'top top',
-          end: pin,
+          end: () => `+=${filmDist()}`,
           scrub,
-          pin: true,
-          anticipatePin: 1,
           invalidateOnRefresh: true,
           onToggle: (self) => {
             inst.boost = staticMode || self.isActive
@@ -378,21 +392,23 @@ export default function FrameScrubSection({
         low.clear()
       }
     },
-    { scope: sectionRef },
+    { scope: sceneRef },
   )
 
   return (
-    <section
-      id={id}
-      ref={sectionRef}
-      className={`scrub-section${sheet ? ' page-sheet' : ''}${tone ? ` tone-${tone}` : ''}`}
-      data-brush={brush || undefined}
-    >
-      <div ref={mediaRef} className="scrub-media">
-        <canvas ref={canvasRef} className="scrub-canvas" />
-        <div className="scrub-vignette" />
-      </div>
-      <div ref={overlayRef} className="scrub-overlay">{children}</div>
-    </section>
+    <div className="scene" ref={sceneRef} style={{ height: sceneHeight }}>
+      <section
+        id={id}
+        ref={sectionRef}
+        className={`scrub-section${sheet ? ' page-sheet' : ''}${tone ? ` tone-${tone}` : ''}`}
+        data-brush={brush || undefined}
+      >
+        <div ref={mediaRef} className="scrub-media">
+          <canvas ref={canvasRef} className="scrub-canvas" />
+          <div className="scrub-vignette" />
+        </div>
+        <div ref={overlayRef} className="scrub-overlay">{children}</div>
+      </section>
+    </div>
   )
 }

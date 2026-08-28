@@ -8,6 +8,7 @@ import { WaitlistProvider } from './context/WaitlistContext'
 import { WaitlistModal } from './components/WaitlistModal.jsx'
 import Nav from './components/Nav.jsx'
 import BrushCursor from './components/BrushCursor.jsx'
+import Atmosphere from './components/Atmosphere.jsx'
 import Hero from './components/Hero.jsx'
 import RingGallery from './components/RingGallery.jsx'
 import EngineeredCold from './components/EngineeredCold.jsx'
@@ -68,6 +69,7 @@ export default function App() {
       )}
       <Nav />
       <BrushCursor />
+      <Atmosphere />
       <main>
         <Hero />
         <RingGallery />
