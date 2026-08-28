@@ -318,7 +318,9 @@ export default function FrameScrubSection({
         scheduleDecodes()
       }
 
-      // feather the top edge away while sliding over the section beneath
+      // feather the top edge away while sliding over the scene beneath.
+      // IMPORTANT: the trigger is the WRAPPER, never the sticky section —
+      // a sticky element measured mid-stick gives garbage positions.
       gsap.fromTo(
         section,
         { '--feather': '62vh' },
@@ -326,7 +328,7 @@ export default function FrameScrubSection({
           '--feather': '0vh',
           ease: 'none',
           immediateRender: true,
-          scrollTrigger: { trigger: section, start: 'top 99.9%', end: 'top top', scrub: true },
+          scrollTrigger: { trigger: sceneRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
         },
       )
 
