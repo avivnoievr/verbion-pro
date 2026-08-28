@@ -38,6 +38,7 @@ const N = CARDS.length
 const RADIUS = 470
 
 export default function RingGallery() {
+  const sceneRef = useRef(null)
   const sectionRef = useRef(null)
 
   useGSAP(
@@ -48,7 +49,7 @@ export default function RingGallery() {
       // feather the top edge away while sliding over the hero
       gsap.fromTo(
         sectionRef.current,
-        { '--feather': '48vh' },
+        { '--feather': '62vh' },
         {
           '--feather': '0vh',
           ease: 'none',
@@ -57,15 +58,14 @@ export default function RingGallery() {
         },
       )
 
+      // sticky scene: wrapper supplies the scroll length, no pin
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: sceneRef.current,
           start: 'top top',
-          end: '+=260%',
+          end: () => `+=${Math.round(2.6 * window.innerHeight)}`,
           scrub: 1,
-          pin: true,
-          anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       })
@@ -92,18 +92,20 @@ export default function RingGallery() {
       q('.ring-use').forEach((el, i) => {
         tl.fromTo(el, { opacity: 0, x: 36 }, { opacity: 1, x: 0, duration: 0.07, ease: 'power2.out' }, 0.32 + i * 0.055)
       })
-      // lateral sweep out — ENGINEERED COLD answers from the right
+      // lateral sweep out — ends half-visible so the cold section's
+      // feathered edge dissolves into the ring, not into black
       tl.to(
         [q('.ring-scene'), q('.ring-copy')],
-        { opacity: 0.08, xPercent: -7, filter: 'blur(14px)', duration: 0.08, ease: 'power1.in' },
+        { opacity: 0.55, xPercent: -6, filter: 'blur(12px)', duration: 0.08, ease: 'power1.in' },
         0.92,
       )
     },
-    { scope: sectionRef },
+    { scope: sceneRef },
   )
 
   return (
-    <section ref={sectionRef} className="ring-section" data-brush>
+    <div className="scene" ref={sceneRef} style={{ height: 'calc(460vh)' }}>
+      <section ref={sectionRef} className="ring-section" data-brush>
       <div className="ring-glow" />
       <div className="ring-scene" aria-hidden="true">
         <div className="ring">
@@ -134,6 +136,7 @@ export default function RingGallery() {
           </div>
         ))}
       </div>
-    </section>
+      </section>
+    </div>
   )
 }

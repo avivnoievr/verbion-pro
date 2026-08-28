@@ -7,6 +7,7 @@ import AtomBi2Te3 from './AtomBi2Te3.jsx'
 // the second half — grows and spins itself into a light burst that
 // opens the engine film (whose iris + lightning pick it up beneath).
 export default function EngineeredCold() {
+  const sceneRef = useRef(null)
   const sectionRef = useRef(null)
   const atomProgress = useRef(0)
 
@@ -18,7 +19,7 @@ export default function EngineeredCold() {
       // feather the top edge away while sliding over the gallery
       gsap.fromTo(
         sectionRef.current,
-        { '--feather': '48vh' },
+        { '--feather': '62vh' },
         {
           '--feather': '0vh',
           ease: 'none',
@@ -27,15 +28,14 @@ export default function EngineeredCold() {
         },
       )
 
+      // sticky scene: wrapper supplies the scroll length, no pin
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: sceneRef.current,
           start: 'top top',
-          end: '+=200%',
+          end: () => `+=${Math.round(2 * window.innerHeight)}`,
           scrub: 1,
-          pin: true,
-          anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       })
@@ -75,11 +75,12 @@ export default function EngineeredCold() {
           0.88,
         )
     },
-    { scope: sectionRef },
+    { scope: sceneRef },
   )
 
   return (
-    <section ref={sectionRef} className="cold-section" data-brush>
+    <div className="scene" ref={sceneRef} style={{ height: 'calc(400vh)' }}>
+      <section ref={sectionRef} className="cold-section" data-brush>
       <div className="slab3d cold-slab" aria-hidden="true">Bi₂Te₃</div>
       <div className="slab3d cold-float cold-float-1" aria-hidden="true">Bi₂Te₃</div>
       <div className="slab3d cold-float cold-float-2" aria-hidden="true">Bi₂Te₃</div>
@@ -96,6 +97,7 @@ export default function EngineeredCold() {
         <div className="cold-chip">30W · Bi₂Te₃ · COP 0.50–0.62</div>
       </div>
       <div className="atom-flash" aria-hidden="true" />
-    </section>
+      </section>
+    </div>
   )
 }
