@@ -46,24 +46,42 @@ export default function RingGallery() {
       const q = gsap.utils.selector(sectionRef)
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-      // feather the top edge away while sliding over the hero
+      // ===== דיזולב במקום החלקה =====
+      // הסקשן דביק, אבל עד שהעטיפה שלו מגיעה לראש המסך הוא יושב
+      // נמוך יותר ו"נדחף מלמטה" כלוח עם קצה חד. ה-y כאן מבטל בדיוק
+      // את ההיסט הזה (‎-100vh ➜ 0 לינארי), כך שהשכבה נראית **נעוצה
+      // לראש המסך לכל אורך המעבר**, וכל המעבר קורה בשקיפות.
+      //
+      // אין קצה שנכנס ➜ אין מה להמיס ➜ אפשר לוותר על ה-feather.
+      // זה גם מוריד חלק נע אחד מהסנכרון (ScrollTrigger נפרד שנטה
+      // להיפרד מהגיאומטריה — משם חזר התפר בעבר).
       gsap.fromTo(
         sectionRef.current,
-        { '--feather': '62vh' },
+        { y: () => -window.innerHeight, opacity: 0, '--feather': '0vh' },
         {
-          '--feather': '0vh',
+          y: 0,
+          opacity: 1,
           ease: 'none',
           immediateRender: true,
-          scrollTrigger: { trigger: sceneRef.current, start: 'top 99.9%', end: 'top top', scrub: true },
+          scrollTrigger: {
+            trigger: sceneRef.current,
+            start: 'top bottom',
+            end: 'top top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
         },
       )
 
-      // sticky scene: wrapper supplies the scroll length, no pin
+      // sticky scene: wrapper supplies the scroll length, no pin.
+      // ⚠️ מתחיל ב-'top bottom' ולא 'top top' — הטבעת נפתחת **תוך כדי**
+      // הדיזולב, בדיוק כשסרט ההירו נגמר. אחרת המסך היה מתמלא ברקע
+      // ריק של הסקשן לפני שמשהו קורה בו.
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
           trigger: sceneRef.current,
-          start: 'top top',
+          start: 'top bottom',
           end: () => `+=${Math.round(2.6 * window.innerHeight)}`,
           scrub: 1,
           invalidateOnRefresh: true,
